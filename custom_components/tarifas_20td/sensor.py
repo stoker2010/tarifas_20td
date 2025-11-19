@@ -36,6 +36,7 @@ from .const import (
     CONF_POWER_VALLE,
     CONF_POWER_PUNTA,
     CONF_WORKDAY,
+    CONF_TERMO_NOMINAL_POWER, # Nueva constante importada
     TRAMO_VALLE,
     TRAMO_LLANA,
     TRAMO_PUNTA,
@@ -57,15 +58,28 @@ async def async_setup_entry(
         name="Hogar",
         manufacturer="@stoker2010",
         model="Gestor Energético 2.0TD",
-        sw_version="0.6.0",
+        sw_version="0.6.3",
         configuration_url="https://github.com/stoker2010/tarifas_20td",
+    )
+    
+    # Info del Dispositivo Termo (Para agrupar la info del termo)
+    device_info_termo = DeviceInfo(
+        identifiers={(DOMAIN, f"{entry.entry_id}_termo")},
+        name="Termo Eléctrico",
+        manufacturer="@stoker2010",
+        model="Control Termo v1",
+        via_device=(DOMAIN, entry.entry_id),
     )
 
     entities = []
 
-    # 1. Configuración (Potencias)
+    # 1. Configuración (Potencias Hogar)
     entities.append(ConfigInfoSensor(hass, "Potencia Valle", f"{config[CONF_POWER_VALLE]} W", device_info))
     entities.append(ConfigInfoSensor(hass, "Potencia Punta", f"{config[CONF_POWER_PUNTA]} W", device_info))
+    
+    # 1b. Configuración (Potencia Termo - Nuevo)
+    if CONF_TERMO_NOMINAL_POWER in config:
+        entities.append(ConfigInfoSensor(hass, "Potencia Máxima Termo", f"{config[CONF_TERMO_NOMINAL_POWER]} W", device_info_termo))
 
     # 2. Sensor Tramo
     tramo_sensor = Tarifa20TDTramo(hass, config, device_info)
@@ -96,7 +110,7 @@ async def async_setup_entry(
 
 
 # ------------------------------------------------------------------
-# CLASES Y LÓGICA (Idénticas a v0.5.2)
+# CLASES Y LÓGICA
 # ------------------------------------------------------------------
 class ConfigInfoSensor(SensorEntity):
     _attr_entity_category = EntityCategory.DIAGNOSTIC
