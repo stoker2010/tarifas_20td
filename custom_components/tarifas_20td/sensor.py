@@ -57,15 +57,15 @@ async def async_setup_entry(
         name="Hogar",
         manufacturer="@stoker2010",
         model="Gestor Energético 2.0TD",
-        sw_version="0.6.0",
+        sw_version="0.5.2",
         configuration_url="https://github.com/stoker2010/tarifas_20td",
     )
 
     entities = []
 
-    # 1. Configuración (Potencias)
-    entities.append(ConfigInfoSensor(hass, "Config: Potencia Valle", f"{config[CONF_POWER_VALLE]} W", device_info))
-    entities.append(ConfigInfoSensor(hass, "Config: Potencia Punta", f"{config[CONF_POWER_PUNTA]} W", device_info))
+    # 1. Configuración (Nombres limpios)
+    entities.append(ConfigInfoSensor(hass, "Potencia Valle", f"{config[CONF_POWER_VALLE]} W", device_info))
+    entities.append(ConfigInfoSensor(hass, "Potencia Punta", f"{config[CONF_POWER_PUNTA]} W", device_info))
 
     # 2. Sensor Tramo
     tramo_sensor = Tarifa20TDTramo(hass, config, device_info)
@@ -79,15 +79,15 @@ async def async_setup_entry(
     balance_estimado = BalanceNetoEstimado(hass, config, balance_real, device_info)
     entities.append(balance_estimado)
 
-    # 5. Sensor Intensidad Excedente (5 min)
-    intensidad_sensor = IntensidadExcedente(hass, config, balance_real, device_info)
+    # 5. Sensor Intensidad Vertido 0 (Lógica +/-)
+    intensidad_sensor = IntensidadVertidoCero(hass, config, balance_real, device_info)
     entities.append(intensidad_sensor)
 
     # 6. Procesador de Energía y Sensores Diarios
     energy_processor = EnergyProcessor(hass, config, tramo_sensor, device_info)
     
     entities.extend([
-        energy_processor.sensor_import_total, 
+        energy_processor.sensor_import_total,
         energy_processor.sensor_export,
         energy_processor.sensor_home_consumption
     ])
@@ -303,10 +303,10 @@ class BalanceNetoEstimado(SensorEntity):
         return round(self._state, 4)
 
 # ------------------------------------------------------------------
-# 4. INTENSIDAD EXCEDENTE
+# 4. INTENSIDAD VERTIDO 0 (BIDIRECCIONAL)
 # ------------------------------------------------------------------
-class IntensidadExcedente(SensorEntity):
-    """Calcula Amperios disponibles (240V). Intervalo 5 min."""
+class IntensidadVertidoCero(SensorEntity):
+    """Calcula Amperios (+/-) para terminar la hora en 0 balance. Intervalo 5 min."""
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_device_class = SensorDeviceClass.CURRENT
     _attr_native_unit_of_measurement = UnitOfElectricCurrent.AMPERE
@@ -317,8 +317,8 @@ class IntensidadExcedente(SensorEntity):
         self._attr_device_info = device_info
         self._grid_entity = config[CONF_GRID_SENSOR]
         self._real_balance_sensor = real_balance_sensor
-        self._attr_name = "Intensidad Excedente"
-        self._attr_unique_id = f"{DOMAIN}_intensidad_excedente"
+        self._attr_name = "Intensidad vertido 0"
+        self._attr_unique_id = f"{DOMAIN}_intensidad_vertido_0"
         self._state = 0.0
         self._voltage = 240.0 
 
@@ -334,6 +334,7 @@ class IntensidadExcedente(SensorEntity):
 
     @callback
     def _update_current(self, now):
+        # 1. Obtener balance real
         balance_real = self._real_balance_sensor.native_value
         if balance_real is None: balance_real = 0.0
 
@@ -348,20 +349,27 @@ class IntensidadExcedente(SensorEntity):
         except ValueError:
             grid_power_w = 0.0
 
+        # 2. Calcular tiempo restante
         now_time = dt_util.now()
         minutes_left = 60 - now_time.minute
-        if minutes_left == 0: minutes_left = 1
+        if minutes_left == 0: minutes_left = 1 
         hours_left = minutes_left / 60.0
 
+        # 3. Proyección de Energía a fin de hora
+        # Fórmula: Balance_Acumulado + (Potencia_Instantanea * Tiempo_Restante)
+        # Grid: (+) Venta, (-) Compra
         projected_end_kwh = balance_real + (grid_power_w / 1000.0 * hours_left)
 
-        if projected_end_kwh > 0:
-            energy_to_burn_kwh = projected_end_kwh
-            power_to_burn_kw = energy_to_burn_kwh / hours_left
-            power_to_burn_w = power_to_burn_kw * 1000.0
-            self._state = power_to_burn_w / self._voltage
-        else:
-            self._state = 0.0
+        # 4. Calcular Amperios necesarios para corregir esa energía en el tiempo restante
+        # Si projected > 0 (Excedente): Necesitamos consumir (+) amperios
+        # Si projected < 0 (Déficit): Necesitamos inyectar/reducir (-) amperios
+        # Potencia_Correccion (kW) = Energía_Sobrante (kWh) / Tiempo_Restante (h)
+        
+        power_correction_kw = projected_end_kwh / hours_left
+        power_correction_w = power_correction_kw * 1000.0
+        
+        # Amperios a 240V
+        self._state = power_correction_w / self._voltage
 
         self.async_write_ha_state()
 
@@ -379,7 +387,7 @@ class EnergyProcessor:
         self.grid_entity = config[CONF_GRID_SENSOR]
         self.solar_entity = config[CONF_SOLAR_SENSOR]
         
-        # Sensores Diarios: Solo Total Importado, Export y Consumo
+        # SOLO IMPORTACIÓN TOTAL
         self.sensor_import_total = DailyEnergySensor(hass, "Energía Importada Total (Diario)", "daily_import_total", device_info)
         self.sensor_export = DailyEnergySensor(hass, "Energía Excedente (Diario)", "daily_export", device_info)
         self.sensor_home_consumption = DailyEnergySensor(hass, "Consumo Hogar (Diario)", "daily_home", device_info)
