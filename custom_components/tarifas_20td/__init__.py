@@ -1,11 +1,18 @@
-"""La integración de Tarifas 2.0TD."""
+"""Inicialización de Tarifas 2.0TD."""
 from __future__ import annotations
 
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.typing import ConfigType
 
-DOMAIN = "tarifas_20td"
+from .const import DOMAIN
 
-def setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Configuración inicial mediante YAML (si se requiere)."""
+PLATFORMS: list[str] = ["sensor"]
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Configurar desde una entrada de configuración (UI)."""
+    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
     return True
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Descargar una entrada de configuración."""
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
