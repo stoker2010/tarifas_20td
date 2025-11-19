@@ -21,8 +21,7 @@ This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff 
     * **Real:** Resets to 0 at XX:00.
     * **Estimated:** Projected balance for the end of the hour.
 * **Surplus Current:** Calculates available Amps (at 240V) if the estimated balance is positive.
-* **Daily Counters:** Energy sensors reset at 00:00.
-* **Device Info:** Shows your configuration data directly on the device page.
+* **Daily Counters:** Energy sensors reset at 00:00. Tracks Imports (Total & per period), Exports, and Home Consumption.
 
 ### 🚀 Installation & Config
 
@@ -32,9 +31,10 @@ This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff 
 
 ### 📊 Sensors
 
-* `sensor.intensidad_excedente`: **New!** Amps available to use (calculated at 240V) *only* if the estimated hourly balance is positive.
+* `sensor.intensidad_excedente`: Amps available to use (calculated at 240V) *only* if the estimated hourly balance is positive.
 * `sensor.balance_neto_horario_estimado`: Projected kWh.
-* `sensor.energia_importada_[tramo]_diario`: Daily import counters.
+* `sensor.energia_importada_[tramo]_diario`: Daily import counters per period.
+* `sensor.energia_importada_total_diario`: **Total** daily imported energy (24h).
 * `sensor.energia_excedente_diario`: Daily export.
 * `sensor.consumo_hogar_diario`: Daily home consumption.
 
@@ -51,9 +51,9 @@ Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance N
 * **Balance Neto Horario:**
     * **Real:** kWh netos acumulados en la hora (Reset XX:00).
     * **Estimado:** Proyección de cierre de hora según potencia actual.
-* **Intensidad Excedente:** **¡Nuevo!** Te indica cuántos Amperios (calculado a 240V) te sobran en tiempo real, **solo si la estimación de la hora es positiva** (es decir, si tienes saldo a favor).
-* **Contadores Diarios:** Sensores de energía (Importación, Excedente, Consumo) que se ponen a 0 cada noche.
-* **Datos de Configuración:** Ahora puedes ver qué sensores y potencias configuraste directamente en la pestaña del dispositivo.
+* **Intensidad Excedente:** Te indica cuántos Amperios (240V) te sobran en tiempo real, **solo si la estimación de la hora es positiva**.
+* **Contadores Diarios:** Sensores de energía (Importación Total y por Tramos, Excedentes y Consumo Hogar) que se ponen a 0 cada noche.
+* **Datos de Configuración:** Visualiza tus potencias contratadas directamente en la pestaña del dispositivo.
 
 ### 🚀 Instalación y Configuración
 
@@ -65,8 +65,9 @@ Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance N
 
 * `sensor.intensidad_excedente`: Amperios disponibles (a 240V) para encender cargas sin perder el balance positivo.
 * `sensor.balance_neto_horario_estimado`: Estimación de fin de hora.
-* `sensor.energia_importada_[tramo]_diario`: Contadores diarios.
-* `sensor.energia_excedente_diario`: Excedente diario total (un solo valor).
+* `sensor.energia_importada_total_diario`: **Nuevo** Total de energía importada de la red hoy (24h).
+* `sensor.energia_importada_[tramo]_diario`: Contadores diarios por tramo (Valle/Llana/Punta).
+* `sensor.energia_excedente_diario`: Excedente diario total.
 * `sensor.consumo_hogar_diario`: Consumo de casa diario.
 
 ### 🙌 Agradecimientos
