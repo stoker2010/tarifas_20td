@@ -11,114 +11,63 @@
 <a name="english"></a>
 ## 🇬🇧 English Description
 
-This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery) in real-time, and provides **Daily Energy Counters**.
-
-It is designed to simplify energy management for users with solar panels in Spain, providing estimated projections and daily statistics ready for the Home Assistant dashboard.
+This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery), and provides **Daily Energy Counters** and **Surplus Current** estimation.
 
 ### ✨ Features
 
-* **Automatic 2.0TD Periods:** Detects **Peak (Punta)**, **Flat (Llana)**, and **Off-peak (Valle)** periods automatically.
+* **Automatic 2.0TD Periods:** Detects **Peak (Punta)**, **Flat (Llana)**, and **Off-peak (Valle)**.
 * **Holidays Support:** Fully integrated with the official **[Workday](https://www.home-assistant.io/integrations/workday/)** integration.
 * **Hourly Net Balance:**
-    * **Real:** Calculates the accumulated net balance (kWh) and resets to 0 at XX:00.
-    * **Estimated:** Projects how the hour will end based on current instantaneous power.
-* **Daily Energy Counters:** Tracks Imports (per period), Exports, and Home Consumption. **Resets automatically at 00:00 every night.**
+    * **Real:** Resets to 0 at XX:00.
+    * **Estimated:** Projected balance for the end of the hour.
+* **Surplus Current:** Calculates available Amps (at 240V) if the estimated balance is positive.
+* **Daily Counters:** Energy sensors reset at 00:00.
+* **Device Info:** Shows your configuration data directly on the device page.
 
-### 🚀 Installation
+### 🚀 Installation & Config
 
-1.  **Prerequisite:** You must have the **[Workday](https://www.home-assistant.io/integrations/workday/)** integration installed and configured in Home Assistant.
-2.  Add this repository to **HACS** as a **Custom Repository**:
-    * URL: `https://github.com/stoker2010/tarifas_20td`
-    * Category: `Integration`
-3.  Click **Install** in HACS and restart Home Assistant.
+1.  Install via **HACS** (Custom Repository).
+2.  Add integration via **Settings > Devices & Services**.
+3.  Configure Grid/Solar sensors and Contracted Power.
 
-### ⚙️ Configuration
+### 📊 Sensors
 
-This integration supports **Config Flow** (UI Configuration). No YAML is needed.
-
-1.  Go to **Settings** > **Devices & Services**.
-2.  Click **+ Add Integration** and search for **Tarifas España 2.0TD**.
-3.  Fill in the required fields:
-    * **Grid Sensor (Watts):**
-        * Positive value (+) = Surplus/Export (Sending energy to the grid).
-        * Negative value (-) = Consumption (Pulling energy from the grid).
-    * **Solar Sensor (Watts):** Solar production (always positive).
-    * **Contracted Power:** Your power limit for Valle and Punta (in Watts).
-    * **Workday Entity:** Usually `binary_sensor.workday_sensor`.
-
-### 📊 Created Sensors
-
-* **Management:**
-    * `sensor.tarifa_20td_tramo_actual`: Current period (`valle`, `llana`, `punta`).
-    * `sensor.balance_neto_horario_real`: Net kWh accumulated in the current hour (Resets at start of hour).
-    * `sensor.balance_neto_horario_estimado`: **Projection** of the hourly balance at the end of the hour based on current power.
-
-* **Daily Energy Counters (Reset at 00:00):**
-    * `sensor.energia_importada_valle_diario`
-    * `sensor.energia_importada_llana_diario`
-    * `sensor.energia_importada_punta_diario`
-    * `sensor.energia_excedente_diario`
-    * `sensor.consumo_hogar_diario` (Calculated: Solar + Import - Export).
-
-### 🙌 Acknowledgements
-
-Thanks to the YouTube channels of Luis **[@domotica_solar](https://www.youtube.com/@domotica_solar)** and Manolo **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)**, from whom I copied the automations and drew inspiration.
-
-And also to **[@MiguelAngelLV](https://github.com/MiguelAngelLV)** who has two very similar integrations: **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** and **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
+* `sensor.intensidad_excedente`: **New!** Amps available to use (calculated at 240V) *only* if the estimated hourly balance is positive.
+* `sensor.balance_neto_horario_estimado`: Projected kWh.
+* `sensor.energia_importada_[tramo]_diario`: Daily import counters.
+* `sensor.energia_excedente_diario`: Daily export.
+* `sensor.consumo_hogar_diario`: Daily home consumption.
 
 ---
 
 <a name="español"></a>
 ## 🇪🇸 Descripción en Español
 
-Esta integración personalizada para Home Assistant gestiona los **tramos horarios de la tarifa eléctrica española 2.0TD**, calcula el **Balance Neto Horario** (Batería Virtual) y ofrece **Contadores Diarios de Energía**.
-
-Está diseñada para simplificar la gestión energética de usuarios con placas solares en España, ofreciendo proyecciones de cierre de hora y estadísticas diarias automáticas.
+Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance Neto Horario** (Batería Virtual) y ofrece **Contadores Diarios** y cálculo de **Intensidad Excedente**.
 
 ### ✨ Características Principales
 
-* **Control Automático 2.0TD:** Detecta automáticamente los periodos **Punta**, **Llana** y **Valle** según la hora del día.
-* **Soporte de Festivos:** Se integra con la integración oficial **[Workday](https://www.home-assistant.io/integrations/workday/)** para detectar fines de semana y festivos.
+* **Control 2.0TD:** Punta, Llana y Valle automáticos (con festivos).
 * **Balance Neto Horario:**
-    * **Real:** Saldo neto de energía (kWh) acumulado en la hora actual. Se reinicia a 0 cada hora en punto (XX:00).
-    * **Estimado:** Proyección de cómo acabará el saldo de la hora basándose en la potencia instantánea actual.
-* **Contadores Diarios:** Sensores de energía (Importación por tramos, Excedentes y Consumo Hogar) que **se reinician automáticamente a las 00:00 cada noche**.
+    * **Real:** kWh netos acumulados en la hora (Reset XX:00).
+    * **Estimado:** Proyección de cierre de hora según potencia actual.
+* **Intensidad Excedente:** **¡Nuevo!** Te indica cuántos Amperios (calculado a 240V) te sobran en tiempo real, **solo si la estimación de la hora es positiva** (es decir, si tienes saldo a favor).
+* **Contadores Diarios:** Sensores de energía (Importación, Excedente, Consumo) que se ponen a 0 cada noche.
+* **Datos de Configuración:** Ahora puedes ver qué sensores y potencias configuraste directamente en la pestaña del dispositivo.
 
-### 🚀 Instalación
+### 🚀 Instalación y Configuración
 
-1.  **Requisito:** Debes tener instalada y configurada la integración oficial **[Workday](https://www.home-assistant.io/integrations/workday/)** en Home Assistant.
-2.  Añade este repositorio a **HACS** como **Repositorio Personalizado**:
-    * URL: `https://github.com/stoker2010/tarifas_20td`
-    * Categoría: `Integración`
-3.  Pulsa **Descargar** en HACS y reinicia Home Assistant.
-
-### ⚙️ Configuración
-
-Esta integración se configura visualmente desde la interfaz de usuario (UI). No hace falta tocar ficheros YAML.
-
-1.  Ve a **Ajustes** > **Dispositivos y servicios**.
-2.  Pulsa **+ Añadir integración** y busca **Tarifas España 2.0TD**.
-3.  Rellena los datos solicitados:
-    * **Sensor de Red (Grid) en Watios:**
-        * Valor Positivo (+) = Excedente (Venta/Inyección a la red).
-        * Valor Negativo (-) = Consumo (Compra de la red).
-    * **Sensor Solar en Watios:** Producción solar (siempre positivo).
-    * **Potencias Contratadas:** Tu potencia en Valle y Punta (en Watios).
-    * **Entidad Workday:** Normalmente `binary_sensor.workday_sensor`.
+1.  Instala vía **HACS** (Repositorio Personalizado).
+2.  Añade la integración desde **Ajustes > Dispositivos y Servicios**.
+3.  Configura tus sensores de Red/Solar y potencias.
 
 ### 📊 Sensores Generados
 
-* **Gestión:**
-    * `sensor.tarifa_20td_tramo_actual`: Estado actual (`valle`, `llana`, `punta`).
-    * `sensor.balance_neto_horario_real`: kWh netos acumulados en la hora en curso (Reset XX:00).
-    * `sensor.balance_neto_horario_estimado`: **Estimación** de cierre de hora según tu consumo/producción actual.
-
-* **Contadores Diarios (Reset a las 00:00):**
-    * `sensor.energia_importada_valle_diario`
-    * `sensor.energia_importada_llana_diario`
-    * `sensor.energia_importada_punta_diario`
-    * `sensor.energia_excedente_diario`
-    * `sensor.consumo_hogar_diario` (Calculado: Solar + Importado - Exportado).
+* `sensor.intensidad_excedente`: Amperios disponibles (a 240V) para encender cargas sin perder el balance positivo.
+* `sensor.balance_neto_horario_estimado`: Estimación de fin de hora.
+* `sensor.energia_importada_[tramo]_diario`: Contadores diarios.
+* `sensor.energia_excedente_diario`: Excedente diario total (un solo valor).
+* `sensor.consumo_hogar_diario`: Consumo de casa diario.
 
 ### 🙌 Agradecimientos
 
