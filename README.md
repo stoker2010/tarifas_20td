@@ -11,19 +11,15 @@
 <a name="english"></a>
 ## 🇬🇧 English Description
 
-This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery), and provides **Daily Energy Counters**.
+This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery), and provides **Daily Energy Counters** and **Surplus Current** estimation.
 
 ### ✨ Features
 
 * **Hourly Net Balance:**
     * **Real:** Resets to 0 at XX:00.
     * **Estimated:** Projected balance for the end of the hour.
-* **Surplus Current (Smart):** Calculates Amps available (240V) to finish the hour with exactly 0 kWh balance. **Updates every 5 minutes.**
-* **Daily Counters:**
-    * Imports: Total & per period (Valle/Llana/Punta).
-    * Exports (Surplus).
-    * Home Consumption.
-    * **Resets automatically at 00:00.**
+* **Surplus Current (Smart):** Calculates available Amps (at 240V) to finish the hour with exactly 0 kWh balance. **Updates every 5 minutes.**
+* **Daily Counters:** Energy sensors reset at 00:00. Tracks Total Imports, Exports, and Home Consumption.
 
 ### 🚀 Installation & Config
 
@@ -33,10 +29,9 @@ This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff 
 
 ### 📊 Sensors
 
-* `sensor.intensidad_excedente`: Amps available to enable loads and finish the hour at 0 balance.
+* `sensor.intensidad_excedente`: Amps available to use (calculated at 240V) to finish the hour at 0 balance. (Updates every 5 min).
 * `sensor.balance_neto_horario_estimado`: Projected kWh.
-* `sensor.energia_importada_total_diario`: Total daily grid import.
-* `sensor.energia_importada_[tramo]_diario`: Import per period.
+* `sensor.energia_importada_total_diario`: **Total** daily imported energy (24h).
 * `sensor.energia_excedente_diario`: Daily export.
 * `sensor.consumo_hogar_diario`: Daily home consumption.
 
@@ -53,7 +48,7 @@ Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance N
     * **Real:** kWh netos acumulados en la hora (Reset XX:00).
     * **Estimado:** Proyección de cierre de hora.
 * **Intensidad Excedente (Smart):** Calcula cuántos Amperios (240V) puedes consumir **ahora** para terminar la hora con el balance a 0 exacto. **Se actualiza cada 5 minutos.**
-* **Contadores Diarios (Reset 00:00):** Importación (Total y por Tramos), Excedentes y Consumo.
+* **Contadores Diarios (Reset 00:00):** Importación Total, Excedentes y Consumo.
 
 ### 🚀 Instalación y Configuración
 
@@ -63,10 +58,9 @@ Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance N
 
 ### 📊 Sensores Generados
 
-* `sensor.intensidad_excedente`: Amperios disponibles para conectar cargas y aprovechar el excedente horario sin pasarse (Calculado para acabar la hora en 0).
+* `sensor.intensidad_excedente`: Amperios disponibles (a 240V) para encender cargas y terminar la hora en 0 kWh (Actualizado cada 5 min).
 * `sensor.balance_neto_horario_estimado`: Estimación de fin de hora.
-* `sensor.energia_importada_total_diario`: Nuevo Total de energía importada de la red hoy (24h).
-* `sensor.energia_importada_[tramo]_diario`: Contadores diarios por tramo (Consumo de la calle, lo que pagas).
+* `sensor.energia_importada_total_diario`: Total de energía importada de la red hoy (24h).
 * `sensor.energia_excedente_diario`: Excedente diario total.
 * `sensor.consumo_hogar_diario`: Consumo de casa diario.
 
