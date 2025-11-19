@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import callback
 from homeassistant.helpers import selector
 import homeassistant.helpers.config_validation as cv
 
@@ -14,7 +13,11 @@ from .const import (
     CONF_POWER_VALLE,
     CONF_POWER_PUNTA,
     CONF_WORKDAY,
-    DEFAULT_WORKDAY
+    DEFAULT_WORKDAY,
+    CONF_TERMO_SWITCH,
+    CONF_TERMO_TEMP_SENSOR,
+    CONF_TERMO_POWER_SENSOR,
+    CONF_TERMO_NOMINAL_POWER,
 )
 
 class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -27,12 +30,11 @@ class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input is not None:
-            # Validación básica (opcional)
-            return self.async_create_entry(title="Tarifas y Balance 2.0TD", data=user_input)
+            return self.async_create_entry(title="Gestor Energético", data=user_input)
 
-        # Esquema del formulario
         data_schema = vol.Schema(
             {
+                # Sección Hogar
                 vol.Required(CONF_GRID_SENSOR): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain="sensor")
                 ),
@@ -44,6 +46,18 @@ class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(CONF_WORKDAY, default=DEFAULT_WORKDAY): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain="binary_sensor")
                 ),
+
+                # Sección Termo
+                vol.Required(CONF_TERMO_SWITCH): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="switch") # Interruptor real del termo
+                ),
+                vol.Required(CONF_TERMO_TEMP_SENSOR): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor", device_class="temperature")
+                ),
+                vol.Required(CONF_TERMO_POWER_SENSOR): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor", device_class="power")
+                ),
+                vol.Required(CONF_TERMO_NOMINAL_POWER, default=1500): vol.Coerce(int),
             }
         )
 
