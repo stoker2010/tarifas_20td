@@ -1,10 +1,15 @@
 {
   "domain": "tarifas_20td",
-  "name": "Tarifa Eléctrica España 2.0TD",
+  "name": "Tarifas España 2.0TD & Balance",
   "version": "1.0.0",
   "documentation": "https://github.com/stoker2010/tarifas_20td",
-  "dependencies": [],
-  "codeowners": ["@stoker2010"],
+  "dependencies": [
+    "workday"
+  ],
+  "codeowners": [
+    "@stoker2010"
+  ],
   "requirements": [],
-  "iot_class": "local_polling"
+  "iot_class": "local_push",
+  "config_flow": true
 }
