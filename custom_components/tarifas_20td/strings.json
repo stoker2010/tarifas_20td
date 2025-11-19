@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuración Tarifas 2.0TD y Termo",
+        "description": "Introduce los sensores de tu instalación y los datos del Termo Eléctrico.",
+        "data": {
+          "sensor_energia_grid": "Sensor Energía Grid (W)",
+          "sensor_produccion_solar": "Sensor Producción Solar (W)",
+          "potencia_contratada_valle": "Potencia Contratada en Valle (W)",
+          "potencia_contratada_punta": "Potencia Contratada en Punta (W)",
+          "dias_laborables": "Entidad Días Laborables (workday)",
+          "interruptor_termo_electrico": "Interruptor Termo Eléctrico",
+          "temperatura_termo_electrico": "Sensor Temperatura Termo",
+          "sensor_consumo_termo_electrico": "Sensor Consumo Termo (W)",
+          "potencia_maxima_termo": "Potencia Máxima Termo (W)"
+        }
+      }
+    }
+  }
+}
