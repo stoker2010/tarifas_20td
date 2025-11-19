@@ -12,6 +12,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     UnitOfPower,
     UnitOfEnergy,
+    UnitOfElectricCurrent,
+    EntityCategory,
     STATE_UNAVAILABLE,
     STATE_UNKNOWN,
 )
@@ -48,32 +50,45 @@ async def async_setup_entry(
     """Configurar sensores desde ConfigEntry."""
     config = entry.data
 
-    # Info del Dispositivo
+    # Info del Dispositivo (Agrupación)
     device_info = DeviceInfo(
         identifiers={(DOMAIN, entry.entry_id)},
         name="Hogar",
         manufacturer="@stoker2010",
         model="Gestor Energético 2.0TD",
-        sw_version="0.2.0",
+        sw_version="0.3.0",
         configuration_url="https://github.com/stoker2010/tarifas_20td",
     )
 
-    # 1. Sensor Tramo
+    entities = []
+
+    # 1. Sensores de Configuración (Diagnóstico)
+    # Muestran en el dispositivo los datos que introdujiste al configurar
+    entities.append(ConfigInfoSensor(hass, "Config: Sensor Red", config[CONF_GRID_SENSOR], device_info))
+    entities.append(ConfigInfoSensor(hass, "Config: Sensor Solar", config[CONF_SOLAR_SENSOR], device_info))
+    entities.append(ConfigInfoSensor(hass, "Config: Potencia Valle", f"{config[CONF_POWER_VALLE]} W", device_info))
+    entities.append(ConfigInfoSensor(hass, "Config: Potencia Punta", f"{config[CONF_POWER_PUNTA]} W", device_info))
+
+    # 2. Sensor Tramo
     tramo_sensor = Tarifa20TDTramo(hass, config, device_info)
+    entities.append(tramo_sensor)
     
-    # 2. Sensor Balance Neto Real
+    # 3. Sensor Balance Neto Real
     balance_real = BalanceNetoHorario(hass, config, device_info)
+    entities.append(balance_real)
 
-    # 3. Sensor Balance Neto Estimado (NUEVO)
+    # 4. Sensor Balance Neto Estimado
     balance_estimado = BalanceNetoEstimado(hass, config, balance_real, device_info)
+    entities.append(balance_estimado)
 
-    # 4. Procesador de Energía y Sensores Diarios
+    # 5. Sensor Intensidad Excedente (NUEVO)
+    intensidad_sensor = IntensidadExcedente(hass, config, balance_estimado, device_info)
+    entities.append(intensidad_sensor)
+
+    # 6. Procesador de Energía y Sensores Diarios
     energy_processor = EnergyProcessor(hass, config, tramo_sensor, device_info)
-
-    async_add_entities([
-        tramo_sensor, 
-        balance_real,
-        balance_estimado,
+    
+    entities.extend([
         energy_processor.sensor_import_valle,
         energy_processor.sensor_import_llana,
         energy_processor.sensor_import_punta,
@@ -81,11 +96,28 @@ async def async_setup_entry(
         energy_processor.sensor_home_consumption
     ])
 
+    async_add_entities(entities)
+
+
+# ------------------------------------------------------------------
+# SENSORES DE DIAGNÓSTICO (CONFIGURACIÓN)
+# ------------------------------------------------------------------
+class ConfigInfoSensor(SensorEntity):
+    """Muestra datos estáticos de configuración en el dispositivo."""
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:information-outline"
+
+    def __init__(self, hass, name, value, device_info):
+        self._hass = hass
+        self._attr_name = name
+        self._attr_unique_id = f"{DOMAIN}_conf_{name.lower().replace(' ', '_').replace(':', '')}"
+        self._attr_native_value = value
+        self._attr_device_info = device_info
+
 # ------------------------------------------------------------------
 # 1. SENSOR TRAMO HORARIO
 # ------------------------------------------------------------------
 class Tarifa20TDTramo(SensorEntity):
-    """Sensor que determina el tramo actual."""
     def __init__(self, hass, config, device_info):
         self._hass = hass
         self._attr_device_info = device_info
@@ -151,7 +183,6 @@ class Tarifa20TDTramo(SensorEntity):
 # 2. BALANCE NETO HORARIO (REAL)
 # ------------------------------------------------------------------
 class BalanceNetoHorario(RestoreEntity, SensorEntity):
-    """Balance acumulado real que se resetea cada hora."""
     _attr_state_class = SensorStateClass.TOTAL
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
@@ -176,7 +207,6 @@ class BalanceNetoHorario(RestoreEntity, SensorEntity):
                 self._state = 0.0
         
         self._last_update = dt_util.now()
-        
         self.async_on_remove(async_track_state_change_event(
             self._hass, [self._grid_entity], self._on_sensor_change
         ))
@@ -216,10 +246,9 @@ class BalanceNetoHorario(RestoreEntity, SensorEntity):
         return round(self._state, 4)
 
 # ------------------------------------------------------------------
-# 3. BALANCE NETO ESTIMADO (PROYECCIÓN)
+# 3. BALANCE NETO ESTIMADO
 # ------------------------------------------------------------------
 class BalanceNetoEstimado(SensorEntity):
-    """Estima cómo acabará la hora basándose en el balance actual y la potencia actual."""
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
@@ -235,7 +264,6 @@ class BalanceNetoEstimado(SensorEntity):
         self._state = 0.0
 
     async def async_added_to_hass(self):
-        """Escuchar cambios en el grid y en el balance real."""
         self.async_on_remove(
             async_track_state_change_event(
                 self._hass, 
@@ -243,7 +271,6 @@ class BalanceNetoEstimado(SensorEntity):
                 self._update_estimation
             )
         )
-        # También actualizar cada minuto por si la potencia es constante
         self.async_on_remove(
             async_track_time_change(self._hass, self._timer_update, second=0)
         )
@@ -254,14 +281,12 @@ class BalanceNetoEstimado(SensorEntity):
 
     @callback
     def _update_estimation(self, event):
-        # 1. Obtener Balance Real Acumulado
         balance_real = self._real_balance_sensor.native_value
         if balance_real is None: balance_real = 0.0
 
-        # 2. Obtener Potencia Instantánea Grid
         grid_state = self._hass.states.get(self._grid_entity)
         if not grid_state or grid_state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
-            self._state = balance_real # Sin datos de potencia, la estimación es el real
+            self._state = balance_real
             self.async_write_ha_state()
             return
 
@@ -270,16 +295,11 @@ class BalanceNetoEstimado(SensorEntity):
         except ValueError:
             grid_power_w = 0.0
 
-        # 3. Calcular tiempo restante de la hora
         now = dt_util.now()
         minutes_left = 60 - now.minute
         hours_left = minutes_left / 60.0
-
-        # 4. Proyección: Energía = Potencia(kW) * Tiempo(h)
-        # Grid positivo = Excedente, Grid negativo = Consumo
         projected_energy = (grid_power_w / 1000.0) * hours_left
 
-        # 5. Estimación Final
         self._state = balance_real + projected_energy
         self.async_write_ha_state()
 
@@ -288,18 +308,77 @@ class BalanceNetoEstimado(SensorEntity):
         return round(self._state, 4)
 
 # ------------------------------------------------------------------
-# 4. PROCESADOR DE ENERGÍA Y SENSORES DIARIOS
+# 4. INTENSIDAD EXCEDENTE (NUEVO)
+# ------------------------------------------------------------------
+class IntensidadExcedente(SensorEntity):
+    """Calcula los Amperios sobrantes a 240V si la estimación es positiva."""
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_device_class = SensorDeviceClass.CURRENT
+    _attr_native_unit_of_measurement = UnitOfElectricCurrent.AMPERE
+    _attr_icon = "mdi:current-ac"
+
+    def __init__(self, hass, config, estimado_sensor, device_info):
+        self._hass = hass
+        self._attr_device_info = device_info
+        self._grid_entity = config[CONF_GRID_SENSOR]
+        self._estimado_sensor = estimado_sensor
+        self._attr_name = "Intensidad Excedente"
+        self._attr_unique_id = f"{DOMAIN}_intensidad_excedente"
+        self._state = 0.0
+        self._voltage = 240.0 # Fijo según petición
+
+    async def async_added_to_hass(self):
+        self.async_on_remove(
+            async_track_state_change_event(
+                self._hass, 
+                [self._grid_entity, self._estimado_sensor.entity_id], 
+                self._update_current
+            )
+        )
+
+    @callback
+    def _update_current(self, event):
+        # 1. Comprobar si la estimación de la hora es positiva (vamos a tener excedente)
+        est_balance = self._estimado_sensor.native_value
+        if est_balance is None or est_balance <= 0:
+            self._state = 0.0
+            self.async_write_ha_state()
+            return
+
+        # 2. Si la estimación es positiva, miramos la potencia instantánea
+        grid_state = self._hass.states.get(self._grid_entity)
+        if not grid_state or grid_state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE):
+            self._state = 0.0
+            self.async_write_ha_state()
+            return
+
+        try:
+            grid_power_w = float(grid_state.state)
+        except ValueError:
+            grid_power_w = 0.0
+
+        # 3. Cálculo: Si estamos vertiendo (Grid > 0), calculamos intensidad a 240V
+        if grid_power_w > 0:
+            self._state = grid_power_w / self._voltage
+        else:
+            self._state = 0.0
+            
+        self.async_write_ha_state()
+
+    @property
+    def native_value(self):
+        return round(self._state, 2)
+
+# ------------------------------------------------------------------
+# 5. PROCESADOR ENERGÍA (DIARIOS)
 # ------------------------------------------------------------------
 class EnergyProcessor:
-    """Gestiona los contadores diarios."""
-
     def __init__(self, hass, config, tramo_sensor, device_info):
         self.hass = hass
         self.tramo_sensor = tramo_sensor
         self.grid_entity = config[CONF_GRID_SENSOR]
         self.solar_entity = config[CONF_SOLAR_SENSOR]
         
-        # Sensores Diarios (DailyEnergySensor)
         self.sensor_import_valle = DailyEnergySensor(hass, "Energía Importada Valle (Diario)", "daily_import_valle", device_info)
         self.sensor_import_llana = DailyEnergySensor(hass, "Energía Importada Llana (Diario)", "daily_import_llana", device_info)
         self.sensor_import_punta = DailyEnergySensor(hass, "Energía Importada Punta (Diario)", "daily_import_punta", device_info)
@@ -319,13 +398,10 @@ class EnergyProcessor:
         async_track_state_change_event(
             self.hass, [self.grid_entity, self.solar_entity], self._on_change
         )
-        # Programar reset a las 00:00:00
         async_track_time_change(self.hass, self._reset_daily_counters, hour=0, minute=0, second=0)
 
     @callback
     def _reset_daily_counters(self, now):
-        """Resetea todos los sensores a 0 a medianoche."""
-        _LOGGER.debug("Reseteando contadores diarios a 0")
         self.sensor_import_valle.reset()
         self.sensor_import_llana.reset()
         self.sensor_import_punta.reset()
@@ -350,10 +426,8 @@ class EnergyProcessor:
         hours = (now - self._last_update).total_seconds() / 3600.0
         self._last_update = now
         
-        # Cálculos
         energy_grid_kwh = (grid_w / 1000.0) * hours
         
-        # 1. Exportación / Importación
         if energy_grid_kwh > 0:
             self.sensor_export.add_energy(energy_grid_kwh)
         else:
@@ -363,16 +437,12 @@ class EnergyProcessor:
             elif tramo == TRAMO_LLANA: self.sensor_import_llana.add_energy(imported_kwh)
             elif tramo == TRAMO_PUNTA: self.sensor_import_punta.add_energy(imported_kwh)
         
-        # 2. Consumo Hogar
         home_w = solar_w - grid_w
         if home_w < 0: home_w = 0 
         energy_home_kwh = (home_w / 1000.0) * hours
         self.sensor_home_consumption.add_energy(energy_home_kwh)
 
-
 class DailyEnergySensor(RestoreEntity, SensorEntity):
-    """Sensor de energía que se resetea diariamente."""
-    
     _attr_state_class = SensorStateClass.TOTAL
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
