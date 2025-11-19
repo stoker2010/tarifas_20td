@@ -57,6 +57,12 @@ This integration supports **Config Flow** (UI Configuration). No YAML is needed.
     * `sensor.energia_excedente_total`
     * `sensor.consumo_hogar_total` (Calculated: Solar + Import - Export).
 
+### 🙌 Acknowledgements
+
+Special thanks to **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**. This project is heavily inspired by his excellent integrations **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** and **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
+
+Also inspired by the content from the YouTube channels **@domotica_solar** and **@proyectosmicropic**.
+
 ---
 
 <a name="español"></a>
@@ -107,6 +113,12 @@ Esta integración se configura visualmente desde la interfaz de usuario (UI). No
     * `sensor.energia_importada_punta`
     * `sensor.energia_excedente_total`
     * `sensor.consumo_hogar_total` (Calculado: Solar + Importado - Exportado).
+
+### 🙌 Agradecimientos
+
+Agradecimiento especial a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**. Este proyecto está fuertemente inspirado en sus excelentes integraciones **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** y **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
+
+Gracias también a la inspiración y conocimientos compartidos por los canales de YouTube **@domotica_solar** y **@proyectosmicropic**.
 
 ---
 <p align="center">
