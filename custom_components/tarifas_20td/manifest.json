@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "documentation": "https://github.com/stoker2010/tarifas_20td",
   "dependencies": [],
-  "codeowners": ["@TU_USUARIO"],
+  "codeowners": ["@stoker2010"],
   "requirements": [],
   "iot_class": "local_polling"
 }
