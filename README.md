@@ -11,16 +11,18 @@
 <a name="english"></a>
 ## 🇬🇧 English Description
 
-This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods** and calculates the **Hourly Net Balance** (Virtual Battery) in real-time.
+This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery) in real-time, and provides **Daily Energy Counters**.
 
-It is designed to simplify energy management for users with solar panels in Spain, providing "Total Increasing" energy sensors ready to be used in the Home Assistant **Energy Dashboard**.
+It is designed to simplify energy management for users with solar panels in Spain, providing estimated projections and daily statistics ready for the Home Assistant dashboard.
 
 ### ✨ Features
 
 * **Automatic 2.0TD Periods:** Detects **Peak (Punta)**, **Flat (Llana)**, and **Off-peak (Valle)** periods automatically.
-* **Holidays Support:** Fully integrated with the official **[Workday](https://www.home-assistant.io/integrations/workday/)** integration to detect national and local holidays (applying Off-peak/Valle tariff accordingly).
-* **Hourly Net Balance:** Calculates the net energy balance (kWh) and automatically resets to 0 at the beginning of every hour (XX:00), essential for "Virtual Battery" calculations.
-* **Energy Dashboard Ready:** Automatically generates cumulative energy sensors (`state_class: total_increasing`) for imports (per period) and exports.
+* **Holidays Support:** Fully integrated with the official **[Workday](https://www.home-assistant.io/integrations/workday/)** integration.
+* **Hourly Net Balance:**
+    * **Real:** Calculates the accumulated net balance (kWh) and resets to 0 at XX:00.
+    * **Estimated:** Projects how the hour will end based on current instantaneous power.
+* **Daily Energy Counters:** Tracks Imports (per period), Exports, and Home Consumption. **Resets automatically at 00:00 every night.**
 
 ### 🚀 Installation
 
@@ -47,15 +49,16 @@ This integration supports **Config Flow** (UI Configuration). No YAML is needed.
 ### 📊 Created Sensors
 
 * **Management:**
-    * `sensor.tarifa_20td_tramo_actual`: Current period (`valle`, `llana`, `punta`). Attributes include current contracted power.
-    * `sensor.balance_neto_horario`: Net kWh for the current hour. Resets at start of hour.
+    * `sensor.tarifa_20td_tramo_actual`: Current period (`valle`, `llana`, `punta`).
+    * `sensor.balance_neto_horario_real`: Net kWh accumulated in the current hour (Resets at start of hour).
+    * `sensor.balance_neto_horario_estimado`: **Projection** of the hourly balance at the end of the hour based on current power.
 
-* **Energy Counters (Accumulated kWh):**
-    * `sensor.energia_importada_valle`
-    * `sensor.energia_importada_llana`
-    * `sensor.energia_importada_punta`
-    * `sensor.energia_excedente_total`
-    * `sensor.consumo_hogar_total` (Calculated: Solar + Import - Export).
+* **Daily Energy Counters (Reset at 00:00):**
+    * `sensor.energia_importada_valle_diario`
+    * `sensor.energia_importada_llana_diario`
+    * `sensor.energia_importada_punta_diario`
+    * `sensor.energia_excedente_diario`
+    * `sensor.consumo_hogar_diario` (Calculated: Solar + Import - Export).
 
 ### 🙌 Acknowledgements
 
@@ -68,16 +71,18 @@ And also to **[@MiguelAngelLV](https://github.com/MiguelAngelLV)** who has two v
 <a name="español"></a>
 ## 🇪🇸 Descripción en Español
 
-Esta integración personalizada para Home Assistant gestiona los **tramos horarios de la tarifa eléctrica española 2.0TD** y calcula el **Balance Neto Horario** (Batería Virtual) en tiempo real.
+Esta integración personalizada para Home Assistant gestiona los **tramos horarios de la tarifa eléctrica española 2.0TD**, calcula el **Balance Neto Horario** (Batería Virtual) y ofrece **Contadores Diarios de Energía**.
 
-Está diseñada para simplificar la gestión energética de usuarios con placas solares en España, generando sensores de energía acumulativos listos para usar en el **Panel de Energía** de Home Assistant.
+Está diseñada para simplificar la gestión energética de usuarios con placas solares en España, ofreciendo proyecciones de cierre de hora y estadísticas diarias automáticas.
 
 ### ✨ Características Principales
 
 * **Control Automático 2.0TD:** Detecta automáticamente los periodos **Punta**, **Llana** y **Valle** según la hora del día.
-* **Soporte de Festivos:** Se integra con la integración oficial **[Workday](https://www.home-assistant.io/integrations/workday/)** para detectar fines de semana y festivos (nacionales o locales), aplicando la tarifa Valle automáticamente.
-* **Balance Neto Horario:** Calcula el saldo neto de energía (kWh) y se reinicia a 0 automáticamente al inicio de cada hora (XX:00).
-* **Panel de Energía:** Genera sensores de energía acumulativos (`state_class: total_increasing`) para importación (por tramos) y exportación, listos para el dashboard oficial de HA.
+* **Soporte de Festivos:** Se integra con la integración oficial **[Workday](https://www.home-assistant.io/integrations/workday/)** para detectar fines de semana y festivos.
+* **Balance Neto Horario:**
+    * **Real:** Saldo neto de energía (kWh) acumulado en la hora actual. Se reinicia a 0 cada hora en punto (XX:00).
+    * **Estimado:** Proyección de cómo acabará el saldo de la hora basándose en la potencia instantánea actual.
+* **Contadores Diarios:** Sensores de energía (Importación por tramos, Excedentes y Consumo Hogar) que **se reinician automáticamente a las 00:00 cada noche**.
 
 ### 🚀 Instalación
 
@@ -104,15 +109,16 @@ Esta integración se configura visualmente desde la interfaz de usuario (UI). No
 ### 📊 Sensores Generados
 
 * **Gestión:**
-    * `sensor.tarifa_20td_tramo_actual`: Estado actual (`valle`, `llana`, `punta`). Incluye atributos con la potencia contratada vigente.
-    * `sensor.balance_neto_horario`: kWh netos de la hora en curso. Se resetea cada hora en punto.
+    * `sensor.tarifa_20td_tramo_actual`: Estado actual (`valle`, `llana`, `punta`).
+    * `sensor.balance_neto_horario_real`: kWh netos acumulados en la hora en curso (Reset XX:00).
+    * `sensor.balance_neto_horario_estimado`: **Estimación** de cierre de hora según tu consumo/producción actual.
 
-* **Contadores de Energía (Acumulados kWh):**
-    * `sensor.energia_importada_valle`
-    * `sensor.energia_importada_llana`
-    * `sensor.energia_importada_punta`
-    * `sensor.energia_excedente_total`
-    * `sensor.consumo_hogar_total` (Calculado: Solar + Importado - Exportado).
+* **Contadores Diarios (Reset a las 00:00):**
+    * `sensor.energia_importada_valle_diario`
+    * `sensor.energia_importada_llana_diario`
+    * `sensor.energia_importada_punta_diario`
+    * `sensor.energia_excedente_diario`
+    * `sensor.consumo_hogar_diario` (Calculado: Solar + Importado - Exportado).
 
 ### 🙌 Agradecimientos
 
