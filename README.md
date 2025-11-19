@@ -59,9 +59,9 @@ This integration supports **Config Flow** (UI Configuration). No YAML is needed.
 
 ### 🙌 Acknowledgements
 
-Special thanks to **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**. This project is heavily inspired by his excellent integrations **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** and **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
+Thanks to the YouTube channels of Luis **@domotica_solar** and Manolo **@proyectosmicropic**, from whom I copied the automations and drew inspiration.
 
-Also inspired by the content from the YouTube channels **@domotica_solar** and **@proyectosmicropic**.
+And also to **[@MiguelAngelLV](https://github.com/MiguelAngelLV)** who has two very similar integrations: **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** and **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
 
 ---
 
@@ -116,9 +116,9 @@ Esta integración se configura visualmente desde la interfaz de usuario (UI). No
 
 ### 🙌 Agradecimientos
 
-Agradecimiento especial a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**. Este proyecto está fuertemente inspirado en sus excelentes integraciones **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** y **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
+Agradecimiento a los canales de YouTube de Luis **@domotica_solar** y Manolo **@proyectosmicropic**, de los que copié las automatizaciones y en los que me he inspirado.
 
-Gracias también a la inspiración y conocimientos compartidos por los canales de YouTube **@domotica_solar** y **@proyectosmicropic**.
+Y también a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)** que tiene dos integraciones muy parecidas: **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** y **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
 
 ---
 <p align="center">
