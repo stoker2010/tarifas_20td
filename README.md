@@ -59,7 +59,7 @@ This integration supports **Config Flow** (UI Configuration). No YAML is needed.
 
 ### 🙌 Acknowledgements
 
-Thanks to the YouTube channels of Luis **@domotica_solar** and Manolo **@proyectosmicropic**, from whom I copied the automations and drew inspiration.
+Thanks to the YouTube channels of Luis **[@domotica_solar](https://www.youtube.com/@domotica_solar)** and Manolo **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)**, from whom I copied the automations and drew inspiration.
 
 And also to **[@MiguelAngelLV](https://github.com/MiguelAngelLV)** who has two very similar integrations: **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** and **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
 
@@ -116,7 +116,7 @@ Esta integración se configura visualmente desde la interfaz de usuario (UI). No
 
 ### 🙌 Agradecimientos
 
-Agradecimiento a los canales de YouTube de Luis **@domotica_solar** y Manolo **@proyectosmicropic**, de los que copié las automatizaciones y en los que me he inspirado.
+Agradecimiento a los canales de YouTube de Luis **[@domotica_solar](https://www.youtube.com/@domotica_solar)** y Manolo **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)**, de los que copié las automatizaciones y en los que me he inspirado.
 
 Y también a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)** que tiene dos integraciones muy parecidas: **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** y **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
 
