@@ -6,12 +6,11 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 
-PLATFORMS: list[str] = ["sensor"]
+# AÑADIMOS LAS NUEVAS PLATAFORMAS
+PLATFORMS: list[str] = ["sensor", "number", "switch"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Configurar desde una entrada de configuración (UI)."""
-    # CORRECCIÓN: Usamos async_forward_entry_setups en lugar de async_setup_platforms
-    # que es la que estaba dando el error en tu registro.
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
