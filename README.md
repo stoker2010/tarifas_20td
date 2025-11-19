@@ -29,7 +29,12 @@ This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff 
 
 1.  Install via **HACS**.
 2.  Add integration via **Settings > Devices & Services**.
-3.  **New:** You will be asked for both Home Energy sensors AND Water Heater (Termo) entities (Switch, Temp, Power).
+3.  **New (v0.6.3):** You will be asked for simplified inputs:
+    * **Sensor Energía Grid** (Grid Power)
+    * **Sensor Producción Solar** (Solar Power)
+    * **Potencia Contratada** (Valle/Punta)
+    * **Días Laborables** (Workday entity)
+    * **Termo Data:** Switch, Temp Sensor, Power Sensor, and Max Power.
 
 ---
 
@@ -54,7 +59,12 @@ Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance N
 
 1.  Instala vía **HACS**.
 2.  Configura desde **Dispositivos y Servicios**.
-3.  **Nuevo:** Se te pedirán los datos del Hogar y los del Termo (Interruptor, Sonda Temp, Sensor Potencia).
+3.  **Nuevo (v0.6.3):** Formulario renovado con nombres más claros:
+    * **Sensor Energía Grid**: Tu sensor de consumo de red (W).
+    * **Sensor Producción Solar**: Tu sensor de inversor (W).
+    * **Potencia Contratada en Valle / Punta**.
+    * **Días Laborables**: Entidad `workday` (para festivos).
+    * **Datos del Termo**: Interruptor, Temperatura, Sensor Consumo y Potencia Máxima.
 
 ### 🙌 Agradecimientos
 
