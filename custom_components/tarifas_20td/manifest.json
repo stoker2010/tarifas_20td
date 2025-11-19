@@ -2,7 +2,7 @@
   "domain": "tarifas_20td",
   "name": "Tarifa Eléctrica España 2.0TD",
   "version": "1.0.0",
-  "documentation": "https://github.com/TU_USUARIO/TU_REPOSITORIO",
+  "documentation": "https://github.com/stoker2010/tarifas_20td",
   "dependencies": [],
   "codeowners": ["@TU_USUARIO"],
   "requirements": [],
