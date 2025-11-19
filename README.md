@@ -109,9 +109,19 @@ Una vez configurado, verás lo siguiente en tu panel:
 
 ### 🙌 Agradecimientos y Créditos
 
-Esta integración ha sido inspirada y desarrollada gracias a la comunidad de Home Assistant en español.
-* Agradecimiento especial a los canales de **[@domotica_solar](https://www.youtube.com/@domotica_solar)**, **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)** y **[@unlocoysutecnologia](https://www.youtube.com/@unlocoysutecnologia)** por la divulgación y sus excelentes tutoriales.
-* Código base inspirado en trabajos de **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**.
+Esta integración ha sido inspirada y desarrollada gracias a la gran comunidad de Home Assistant en español.
+
+**Divulgación y Tutoriales**
+Un agradecimiento especial a los canales que, con sus excelentes tutoriales, hacen posible que aprendamos y mejoremos nuestros hogares inteligentes:
+* 🎥 **[@domotica_solar](https://www.youtube.com/@domotica_solar)**
+* 🎥 **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)**
+* 🎥 **[@unlocoysutecnologia](https://www.youtube.com/@unlocoysutecnologia)**
+* 🎥 **[@HomeAssistantFacil](https://www.youtube.com/@HomeAssistantFacil)**
+
+**Referencias Técnicas**
+Quiero dar las gracias y el reconocimiento técnico a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**. Sus proyectos son referentes indiscutibles en la comunidad y han servido de base conceptual para esta integración:
+* 🛠️ `ha-balance-neto`
+* 🛠️ `ha-tarifa-20td`
 
 <p align="center">
   Desarrollado con ❤️ por <a href="https://github.com/stoker2010">@stoker2010</a>
