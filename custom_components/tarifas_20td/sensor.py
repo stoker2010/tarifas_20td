@@ -19,6 +19,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_point_in_time, async_track_state_change_event
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers.entity import DeviceInfo  # IMPORTANTE: Necesario para crear el dispositivo
 from homeassistant.util import dt as dt_util
 
 from .const import (
@@ -43,16 +44,27 @@ async def async_setup_entry(
     """Configurar sensores desde ConfigEntry."""
     config = entry.data
 
-    # Instanciamos los sensores
+    # DEFINICIÓN DEL DISPOSITIVO "HOGAR"
+    # Al usar el mismo identificador en todos los sensores, se agruparán solos.
+    device_info = DeviceInfo(
+        identifiers={(DOMAIN, entry.entry_id)},
+        name="Hogar",  # Nombre del dispositivo
+        manufacturer="@stoker2010",
+        model="Gestor Energético 2.0TD",
+        sw_version="0.1.0",
+        configuration_url="https://github.com/stoker2010/tarifas_20td",
+    )
+
+    # Instanciamos los sensores pasando la info del dispositivo
+    
     # 1. Sensor Maestro de Tramo Horario
-    tramo_sensor = Tarifa20TDTramo(hass, config)
+    tramo_sensor = Tarifa20TDTramo(hass, config, device_info)
     
     # 2. Sensor de Balance Neto Horario
-    balance_sensor = BalanceNetoHorario(hass, config)
+    balance_sensor = BalanceNetoHorario(hass, config, device_info)
 
     # 3. Sensores Acumulativos de Energía (Contadores kWh)
-    # Estos sensores permitirán ver estadísticas diarias/mensuales en el panel de Energía
-    energy_processor = EnergyProcessor(hass, config, tramo_sensor)
+    energy_processor = EnergyProcessor(hass, config, tramo_sensor, device_info)
 
     async_add_entities([
         tramo_sensor, 
@@ -70,9 +82,10 @@ async def async_setup_entry(
 class Tarifa20TDTramo(SensorEntity):
     """Sensor que determina el tramo actual (Valle, Llana, Punta)."""
 
-    def __init__(self, hass, config):
+    def __init__(self, hass, config, device_info):
         self._hass = hass
         self._config = config
+        self._attr_device_info = device_info  # Asignamos al dispositivo
         self._attr_name = "Tarifa 2.0TD Tramo Actual"
         self._attr_unique_id = f"{DOMAIN}_tramo_actual"
         self._attr_icon = "mdi:clock-time-four-outline"
@@ -146,8 +159,9 @@ class BalanceNetoHorario(RestoreEntity, SensorEntity):
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
     _attr_icon = "mdi:scale-balance"
 
-    def __init__(self, hass, config):
+    def __init__(self, hass, config, device_info):
         self._hass = hass
+        self._attr_device_info = device_info  # Asignamos al dispositivo
         self._grid_entity = config[CONF_GRID_SENSOR]
         self._attr_name = "Balance Neto Horario"
         self._attr_unique_id = f"{DOMAIN}_balance_neto"
@@ -213,23 +227,27 @@ class BalanceNetoHorario(RestoreEntity, SensorEntity):
 class EnergyProcessor:
     """Clase helper para integrar potencia W a energía kWh y repartirla."""
 
-    def __init__(self, hass, config, tramo_sensor):
+    def __init__(self, hass, config, tramo_sensor, device_info):
         self.hass = hass
         self.tramo_sensor = tramo_sensor
         self.grid_entity = config[CONF_GRID_SENSOR]
         self.solar_entity = config[CONF_SOLAR_SENSOR]
         
-        # Sensores Públicos
-        self.sensor_import_valle = CumulativeEnergySensor(hass, "Energía Importada Valle", "import_valle")
-        self.sensor_import_llana = CumulativeEnergySensor(hass, "Energía Importada Llana", "import_llana")
-        self.sensor_import_punta = CumulativeEnergySensor(hass, "Energía Importada Punta", "import_punta")
-        self.sensor_export = CumulativeEnergySensor(hass, "Energía Excedente Total", "export_total")
-        self.sensor_home_consumption = CumulativeEnergySensor(hass, "Consumo Hogar Total", "home_total")
+        # Sensores Públicos (ahora reciben device_info)
+        self.sensor_import_valle = CumulativeEnergySensor(hass, "Energía Importada Valle", "import_valle", device_info)
+        self.sensor_import_llana = CumulativeEnergySensor(hass, "Energía Importada Llana", "import_llana", device_info)
+        self.sensor_import_punta = CumulativeEnergySensor(hass, "Energía Importada Punta", "import_punta", device_info)
+        self.sensor_export = CumulativeEnergySensor(hass, "Energía Excedente Total", "export_total", device_info)
+        self.sensor_home_consumption = CumulativeEnergySensor(hass, "Consumo Hogar Total", "home_total", device_info)
         
         self._last_update = None
         
-        # Iniciar escucha
-        hass.bus.async_listen_once("homeassistant_start", self._start_listening)
+        # Comprobar si HA ya está corriendo
+        if hass.is_running:
+            import asyncio
+            asyncio.create_task(self._start_listening(None))
+        else:
+            hass.bus.async_listen_once("homeassistant_start", self._start_listening)
 
     async def _start_listening(self, _):
         self._last_update = dt_util.now()
@@ -283,13 +301,7 @@ class EnergyProcessor:
                 self.sensor_import_punta.add_energy(imported_kwh)
         
         # 2. Energía Consumo Hogar
-        # Consumo = Solar - Grid(Inyección) + Grid(Importación)
-        # Matemáticamente con tu signo: Consumo = Solar - Grid
-        # Ej: Solar 1000, Grid +200 (sobra). Consumo = 1000 - 200 = 800. Correcto.
-        # Ej: Solar 0, Grid -500 (falta). Consumo = 0 - (-500) = 500. Correcto.
-        
         home_w = solar_w - grid_w
-        # Evitar valores negativos raros por latencia de sensores
         if home_w < 0: home_w = 0 
         
         energy_home_kwh = (home_w / 1000.0) * hours
@@ -303,10 +315,11 @@ class CumulativeEnergySensor(RestoreEntity, SensorEntity):
     _attr_device_class = SensorDeviceClass.ENERGY
     _attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR
 
-    def __init__(self, hass, name, uid_suffix):
+    def __init__(self, hass, name, uid_suffix, device_info):
         self.hass = hass
         self._attr_name = name
         self._attr_unique_id = f"{DOMAIN}_{uid_suffix}"
+        self._attr_device_info = device_info  # Asignamos al dispositivo
         self._state = 0.0
 
     async def async_added_to_hass(self):
