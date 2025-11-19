@@ -1,7 +1,7 @@
 {
   "domain": "tarifas_20td",
   "name": "Tarifas España 2.0TD & Balance",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "documentation": "https://github.com/stoker2010/tarifas_20td",
   "issue_tracker": "https://github.com/stoker2010/tarifas_20td/issues",
   "dependencies": [
