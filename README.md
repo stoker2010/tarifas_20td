@@ -11,69 +11,55 @@
 <a name="english"></a>
 ## 🇬🇧 English Description
 
-This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery), and provides **Daily Energy Counters**. It includes a bidirectional sensor to control zero-export strategies on inverters like Deye.
+This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery), provides **Daily Energy Counters**, and now includes a dedicated **Electric Water Heater (Termo) Manager**.
 
 ### ✨ Features
 
-* **Hourly Net Balance:**
-    * **Real:** Resets to 0 at XX:00.
-    * **Estimated:** Projected balance for the end of the hour.
-* **Zero Export Current (Bidirectional):** Calculates Amps (at 240V) needed to finish the hour at 0 balance.
-    * **Positive (+):** Surplus. You can turn on loads.
-    * **Negative (-):** Deficit. You need to reduce load or inject from batteries.
-    * **Updates every 5 minutes.**
-* **Daily Counters:** Total Import, Export, and Consumption. Resets automatically at 00:00.
+* **Two Devices Created:**
+    1.  **Hogar (Home):** Main energy manager (2.0TD, Net Balance, Daily Counters).
+    2.  **Termo Eléctrico (Water Heater):** Dedicated controls for your water heater.
+* **Hourly Net Balance:** Real & Estimated calculations (Resets at XX:00).
+* **Zero Export Current (Bidirectional):** Calculates Amps (at 240V) to finish the hour at 0 balance (+ Surplus / - Deficit).
+* **Termo Controls:**
+    * Target Temperature Slider (35-60ºC).
+    * Configuration Switches (Surplus Charge, Limit to Max Temp, etc.).
+* **Daily Counters:** Total Import, Export, Consumption (Reset at 00:00).
 
 ### 🚀 Installation & Config
 
-1.  Install via **HACS** (Custom Repository).
+1.  Install via **HACS**.
 2.  Add integration via **Settings > Devices & Services**.
-3.  Configure Grid/Solar sensors and Contracted Power.
-
-### 📊 Sensors
-
-* `sensor.intensidad_vertido_0`: Amps target (240V) to reach 0 balance.
-* `sensor.balance_neto_horario_estimado`: Projected kWh.
-* `sensor.energia_importada_total_diario`: **Total** daily imported energy (24h).
-* `sensor.energia_excedente_diario`: Daily export.
-* `sensor.consumo_hogar_diario`: Daily home consumption.
+3.  **New:** You will be asked for both Home Energy sensors AND Water Heater (Termo) entities (Switch, Temp, Power).
 
 ---
 
 <a name="español"></a>
 ## 🇪🇸 Descripción en Español
 
-Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance Neto Horario** (Batería Virtual) y ofrece **Contadores Diarios**. Incluye un sensor bidireccional para estrategias de vertido cero o control de inversores (Deye, etc.).
+Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance Neto Horario** y ahora incluye un **Gestor de Termo Eléctrico**.
 
 ### ✨ Características Principales
 
-* **Balance Neto Horario:**
-    * **Real:** kWh netos acumulados en la hora (Reset XX:00).
-    * **Estimado:** Proyección de cierre de hora.
-* **Intensidad Vertido 0 (Bidireccional):** Calcula cuántos Amperios (240V) faltan o sobran para terminar la hora en 0 kWh. **Actualiza cada 5 min.**
-    * **Positivo (+):** Te sobran Amperios (puedes consumir).
-    * **Negativo (-):** Te faltan Amperios (debes inyectar/reducir).
-* **Contadores Diarios (Reset 00:00):** Importación Total, Excedentes y Consumo.
+* **Dos Dispositivos:**
+    1.  **Hogar:** Gestor principal (Tarifas, Balance, Excedentes).
+    2.  **Termo Eléctrico:** Nuevo dispositivo con controles específicos.
+* **Balance Neto Horario:** Real y Estimado (Reset XX:00).
+* **Intensidad Vertido 0:** Amperios (+/-) necesarios para acabar la hora en 0 kWh.
+* **Controles del Termo:**
+    * Slider de Temperatura Objetivo (35-60ºC).
+    * Interruptores de configuración (Carga con excedentes, Límites, etc.).
+* **Contadores Diarios:** Importación Total, Excedentes y Consumo (Reset 00:00).
 
-### 🚀 Instalación y Configuración
+### 🚀 Instalación
 
-1.  Instala vía **HACS** (Repositorio Personalizado).
-2.  Añade la integración desde **Ajustes > Dispositivos y Servicios**.
-3.  Configura tus sensores de Red/Solar y potencias.
-
-### 📊 Sensores Generados
-
-* `sensor.intensidad_vertido_0`: Objetivo de Amperios (240V) para equilibrar la hora a 0. Ideal para automatizaciones de inversores.
-* `sensor.balance_neto_horario_estimado`: Estimación de fin de hora.
-* `sensor.energia_importada_total_diario`: Total de energía importada de la red hoy (24h).
-* `sensor.energia_excedente_diario`: Excedente diario total.
-* `sensor.consumo_hogar_diario`: Consumo de casa diario.
+1.  Instala vía **HACS**.
+2.  Configura desde **Dispositivos y Servicios**.
+3.  **Nuevo:** Se te pedirán los datos del Hogar y los del Termo (Interruptor, Sonda Temp, Sensor Potencia).
 
 ### 🙌 Agradecimientos
 
-Agradecimiento a los canales de YouTube de Luis **[@domotica_solar](https://www.youtube.com/@domotica_solar)** y Manolo **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)**, de los que copié las automatizaciones y en los que me he inspirado.
-
-Y también a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)** que tiene dos integraciones muy parecidas: **[ha-tarifa-20td](https://github.com/MiguelAngelLV/ha-tarifa-20td)** y **[ha-balance-neto](https://github.com/MiguelAngelLV/ha-balance-neto)**.
+Agradecimiento a los canales de YouTube de Luis **[@domotica_solar](https://www.youtube.com/@domotica_solar)** y Manolo **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)**.
+Y también a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**.
 
 ---
 <p align="center">
