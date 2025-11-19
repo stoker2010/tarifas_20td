@@ -1,19 +1,20 @@
-# Integración Tarifas 2.0TD España
+# Integración Sensor Tarifas 2.0TD
 
-Esta integración crea un sensor en Home Assistant que indica la tarifa eléctrica actual (Punta, Llana, Valle) según el horario español 2.0TD.
+Este componente personalizado añade un sensor a Home Assistant que indica automáticamente el periodo tarifario actual (Punta, Llana o Valle) según la normativa española.
 
-## Instalación mediante HACS
+## Instalación
 
-1. Añade este repositorio como "Repositorio Personalizado" en HACS.
-2. Instala la integración "Tarifa Eléctrica España 2.0TD".
-3. Reinicia Home Assistant.
+1. Añade este repositorio a HACS como **Integración Personalizada**.
+2. Reinicia Home Assistant.
 
 ## Configuración
 
-Añade esto a tu archivo `configuration.yaml`:
+Añade lo siguiente a tu archivo `configuration.yaml`. 
+Si no usas la integración `Workday`, el sensor usará solo sábados y domingos como festivos.
 
 ```yaml
 sensor:
   - platform: tarifas_20td
     name: "Tarifa Electricidad"
-    workday_entity: binary_sensor.workday_sensor # Opcional, por defecto es este
+    # Opcional: Entidad que indica si es día laborable (por defecto: binary_sensor.workday_sensor)
+    workday_entity: binary_sensor.workday_sensor
