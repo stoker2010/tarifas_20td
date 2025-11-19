@@ -1,23 +1,22 @@
-"""Constantes para la integración Tarifas 2.0TD."""
+"""Constantes para Tarifas 2.0TD."""
 
 DOMAIN = "tarifas_20td"
 
-# Configuración Hogar
-CONF_GRID_SENSOR = "grid_sensor"
-CONF_SOLAR_SENSOR = "solar_sensor"
-CONF_POWER_VALLE = "power_valle"
-CONF_POWER_PUNTA = "power_punta"
-CONF_WORKDAY = "workday_entity"
+# Nombres de claves de configuración (Internal Keys)
+# Estos coinciden ahora con los nombres solicitados en la v0.6.3
+CONF_GRID_SENSOR = "sensor_energia_grid"
+CONF_SOLAR_SENSOR = "sensor_produccion_solar"
+CONF_POWER_VALLE = "potencia_contratada_valle"
+CONF_POWER_PUNTA = "potencia_contratada_punta"
+CONF_WORKDAY = "dias_laborables"
 
 # Configuración Termo
-CONF_TERMO_SWITCH = "termo_switch"
-CONF_TERMO_TEMP_SENSOR = "termo_temp_sensor"
-CONF_TERMO_POWER_SENSOR = "termo_power_sensor"
-CONF_TERMO_NOMINAL_POWER = "termo_nominal_power"
-
-DEFAULT_WORKDAY = "binary_sensor.workday_sensor"
+CONF_TERMO_SWITCH = "interruptor_termo_electrico"
+CONF_TERMO_TEMP_SENSOR = "temperatura_termo_electrico"
+CONF_TERMO_POWER_SENSOR = "sensor_consumo_termo_electrico"
+CONF_TERMO_NOMINAL_POWER = "potencia_maxima_termo"
 
 # Tramos
-TRAMO_VALLE = "valle"
-TRAMO_LLANA = "llana"
-TRAMO_PUNTA = "punta"
+TRAMO_VALLE = "Valle"
+TRAMO_PUNTA = "Punta"
+TRAMO_LLANA = "Llana"
