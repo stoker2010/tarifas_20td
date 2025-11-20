@@ -1,22 +1,25 @@
-"""Constantes para Tarifas 2.0TD."""
+"""Constantes para la integración Tarifas 2.0TD."""
 
 DOMAIN = "tarifas_20td"
 
-# Nombres de claves de configuración (Internal Keys)
-# Estos coinciden ahora con los nombres solicitados en la v0.6.3
-CONF_GRID_SENSOR = "sensor_energia_grid"
-CONF_SOLAR_SENSOR = "sensor_produccion_solar"
-CONF_POWER_VALLE = "potencia_contratada_valle"
-CONF_POWER_PUNTA = "potencia_contratada_punta"
-CONF_WORKDAY = "dias_laborables"
+# Opciones de Menú
+MENU_OPTION_CASA = "casa"
+MENU_OPTION_TERMO = "termo"
 
-# Configuración Termo
-CONF_TERMO_SWITCH = "interruptor_termo_electrico"
-CONF_TERMO_TEMP_SENSOR = "temperatura_termo_electrico"
-CONF_TERMO_POWER_SENSOR = "sensor_consumo_termo_electrico"
-CONF_TERMO_NOMINAL_POWER = "potencia_maxima_termo"
+# Tipos de configuración
+CONF_TYPE = "config_type"
+TYPE_CASA = "type_casa"
+TYPE_TERMO = "type_termo"
 
-# Tramos
-TRAMO_VALLE = "Valle"
-TRAMO_PUNTA = "Punta"
-TRAMO_LLANA = "Llana"
+# Variables Casa
+CONF_ENERGY_SENSOR_IMPORT = "energy_sensor_import"
+CONF_ENERGY_SENSOR_EXPORT = "energy_sensor_export"
+CONF_POWER_CONTRACTED = "power_contracted"
+CONF_ZONE = "zone"
+
+# Variables Termo
+CONF_TERMO_ENTITY = "termo_entity" # El interruptor real (ej: switch.shelly...)
+CONF_TEMP_SENSOR = "temp_sensor"   # El sensor de temperatura real
+
+# Valores por defecto
+DEFAULT_NAME = "Tarifas 2.0TD"
