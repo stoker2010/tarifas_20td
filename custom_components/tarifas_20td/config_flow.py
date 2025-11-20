@@ -45,9 +45,20 @@ class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             user_input[CONF_TYPE] = TYPE_CASA
-            # FORZAMOS EL TÍTULO AQUÍ:
+            
+            # 1. Calculamos un título dinámico (ej: Tarifas Península)
+            zona = user_input.get(CONF_ZONE, "Casa")
+            titulo_final = f"Tarifas {zona} 🏠"
+            
+            # 2. Asignamos un ID único para evitar duplicados fantasma
+            # Usamos 'tarifas_casa' como ID base.
+            await self.async_set_unique_id("tarifas_casa_main")
+            self._abort_if_unique_id_configured()
+            
+            _LOGGER.info("Creando entrada Casa con título: %s", titulo_final)
+            
             return self.async_create_entry(
-                title="Gestión Casa 🏠", 
+                title=titulo_final, 
                 data=user_input
             )
 
@@ -76,9 +87,17 @@ class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             user_input[CONF_TYPE] = TYPE_TERMO
-            # FORZAMOS EL TÍTULO AQUÍ:
+            
+            titulo_final = "Termo Inteligente 🚿"
+            
+            # ID único para el termo
+            await self.async_set_unique_id("tarifas_termo_main")
+            self._abort_if_unique_id_configured()
+
+            _LOGGER.info("Creando entrada Termo con título: %s", titulo_final)
+
             return self.async_create_entry(
-                title="Gestión Termo 🚿", 
+                title=titulo_final, 
                 data=user_input
             )
 
