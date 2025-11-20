@@ -2,18 +2,28 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configuración Tarifas 2.0TD y Termo",
-        "description": "Introduce los sensores de tu instalación y los datos del Termo Eléctrico.",
+        "title": "Selección de Módulo",
+        "menu_options": {
+          "casa": "Gestión de Tarifas (Casa)",
+          "termo": "Gestión de Termo Inteligente"
+        }
+      },
+      "casa": {
+        "title": "Configurar Casa",
+        "description": "Introduce los sensores de energía de tu vivienda.",
         "data": {
-          "sensor_energia_grid": "Sensor Energía Grid (W)",
-          "sensor_produccion_solar": "Sensor Producción Solar (W)",
-          "potencia_contratada_valle": "Potencia Contratada en Valle (W)",
-          "potencia_contratada_punta": "Potencia Contratada en Punta (W)",
-          "dias_laborables": "Entidad Días Laborables (workday)",
-          "interruptor_termo_electrico": "Interruptor Termo Eléctrico",
-          "temperatura_termo_electrico": "Sensor Temperatura Termo",
-          "sensor_consumo_termo_electrico": "Sensor Consumo Termo (W)",
-          "potencia_maxima_termo": "Potencia Máxima Termo (W)"
+          "energy_sensor_import": "Sensor de Importación (Red)",
+          "energy_sensor_export": "Sensor de Exportación (Solar)",
+          "zone": "Zona Geográfica",
+          "power_contracted": "Potencia Contratada (kW)"
+        }
+      },
+      "termo": {
+        "title": "Configurar Termo",
+        "description": "Introduce los dispositivos de tu termo eléctrico.",
+        "data": {
+          "termo_entity": "Interruptor del Termo (Switch)",
+          "temp_sensor": "Sensor de Temperatura"
         }
       }
     }
