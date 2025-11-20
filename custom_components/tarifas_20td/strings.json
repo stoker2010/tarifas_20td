@@ -3,29 +3,33 @@
     "step": {
       "user": {
         "title": "Selección de Módulo",
+        "description": "Elige qué parte de la integración quieres configurar:",
         "menu_options": {
           "casa": "Gestión de Tarifas (Casa)",
           "termo": "Gestión de Termo Inteligente"
         }
       },
       "casa": {
-        "title": "Configurar Casa",
-        "description": "Introduce los sensores de energía de tu vivienda.",
+        "title": "Configurar Casa 🏠",
+        "description": "Configura los sensores de tu compañía eléctrica.",
         "data": {
-          "energy_sensor_import": "Sensor de Importación (Red)",
-          "energy_sensor_export": "Sensor de Exportación (Solar)",
+          "energy_sensor_import": "Sensor Importación (Red)",
+          "energy_sensor_export": "Sensor Exportación (Solar)",
           "zone": "Zona Geográfica",
           "power_contracted": "Potencia Contratada (kW)"
         }
       },
       "termo": {
-        "title": "Configurar Termo",
-        "description": "Introduce los dispositivos de tu termo eléctrico.",
+        "title": "Configurar Termo 🚿",
+        "description": "Configura el control de tu termo eléctrico.",
         "data": {
           "termo_entity": "Interruptor del Termo (Switch)",
-          "temp_sensor": "Sensor de Temperatura"
+          "temp_sensor": "Sensor de Temperatura Actual"
         }
       }
+    },
+    "abort": {
+      "already_configured": "Este servicio ya está configurado."
     }
   }
 }
