@@ -1,1 +1,22 @@
-
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Selección de Módulo",
+                "description": "Elige el módulo a configurar:",
+                "menu_options": {
+                    "casa": "Gestión de Tarifas (Casa)",
+                    "termo": "Gestión de Termo Inteligente"
+                }
+            },
+            "casa": {
+                "title": "Configurar Casa 🏠",
+                "description": "Configura los sensores de energía."
+            },
+            "termo": {
+                "title": "Configurar Termo 🚿",
+                "description": "Configura el control del termo."
+            }
+        }
+    }
+}
