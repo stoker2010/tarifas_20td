@@ -45,8 +45,11 @@ class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             user_input[CONF_TYPE] = TYPE_CASA
-            # Título fijo con emoji para identificarlo fácil
-            return self.async_create_entry(title="Gestión Casa 🏠", data=user_input)
+            # FORZAMOS EL TÍTULO AQUÍ:
+            return self.async_create_entry(
+                title="Gestión Casa 🏠", 
+                data=user_input
+            )
 
         schema = vol.Schema({
             vol.Required(CONF_ENERGY_SENSOR_IMPORT): EntitySelector(
@@ -73,8 +76,11 @@ class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
         if user_input is not None:
             user_input[CONF_TYPE] = TYPE_TERMO
-            # Título fijo con emoji
-            return self.async_create_entry(title="Gestión Termo 🚿", data=user_input)
+            # FORZAMOS EL TÍTULO AQUÍ:
+            return self.async_create_entry(
+                title="Gestión Termo 🚿", 
+                data=user_input
+            )
 
         schema = vol.Schema({
             vol.Required(CONF_TERMO_ENTITY): EntitySelector(
