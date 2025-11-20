@@ -1,50 +1,114 @@
-"""Plataforma Switch para Tarifas 2.0TD (Termo)."""
-from __future__ import annotations
-
+"""Plataforma Switch para Tarifas 2.0TD (Gestión Termo)."""
+import logging
+import asyncio
+from datetime import timedelta
 from homeassistant.components.switch import SwitchEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.event import async_track_point_in_time
+from homeassistant.util import dt as dt_util
+from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, TYPE_TERMO, CONF_TYPE, CONF_TERMO_ENTITY
 
-async def async_setup_entry(
-    hass: HomeAssistant,
-    entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-) -> None:
-    """Configurar entidades Switch."""
+_LOGGER = logging.getLogger(__name__)
 
-    device_info_termo = DeviceInfo(
-        identifiers={(DOMAIN, f"{entry.entry_id}_termo")},
-        name="Termo Eléctrico",
-        manufacturer="@stoker2010",
-        model="Control Termo v1",
-        via_device=(DOMAIN, entry.entry_id),
-    )
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Configura los switches desde una entrada de configuración."""
+    config = config_entry.data
 
-    async_add_entities([
-        TermoConfigSwitch(hass, "Cargar con Excedentes", "charge_surplus", "mdi:solar-power", device_info_termo),
-        TermoConfigSwitch(hass, "Limitar carga exc. a Temp Max", "limit_surplus_temp", "mdi:thermometer-check", device_info_termo),
-        TermoConfigSwitch(hass, "Límite Temperatura Máxima", "limit_max_temp", "mdi:thermometer-alert", device_info_termo),
-    ])
+    # Solo creamos switches si es configuración de TERMO
+    if config.get(CONF_TYPE) == TYPE_TERMO:
+        termo_real = config[CONF_TERMO_ENTITY]
+        async_add_entities([
+            TermoForceSwitch(hass, termo_real),
+            TermoBoostSwitch(hass, termo_real)
+        ])
 
-class TermoConfigSwitch(SwitchEntity):
-    """Interruptor de configuración genérico."""
+class TermoForceSwitch(SwitchEntity, RestoreEntity):
+    """Interruptor para Forzar el Termo (Manual)."""
 
-    def __init__(self, hass, name, uid_suffix, icon, device_info):
-        self._hass = hass
-        self._attr_name = name
-        self._attr_unique_id = f"{DOMAIN}_termo_{uid_suffix}"
-        self._attr_icon = icon
-        self._attr_device_info = device_info
-        self._attr_is_on = False # Por defecto apagado
+    def __init__(self, hass, termo_entity):
+        self.hass = hass
+        self._termo_entity = termo_entity
+        self._is_on = False
+        self._attr_name = "Termo Forzar Encendido"
+        self._attr_unique_id = f"termo_force_{termo_entity}"
+        self._attr_icon = "mdi:fire-alert"
 
     async def async_turn_on(self, **kwargs):
-        self._attr_is_on = True
+        """Activar forzado."""
+        self._is_on = True
+        # Encendemos el termo real
+        await self.hass.services.async_call(
+            "switch", "turn_on", {"entity_id": self._termo_entity}
+        )
         self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs):
-        self._attr_is_on = False
+        """Desactivar forzado."""
+        self._is_on = False
+        # Opcional: Al quitar el forzado, podríamos apagar el termo
+        # o dejar que la automatización decida. Por seguridad, no lo apagamos
+        # drásticamente, pero lo lógico es que si quitas el forzado, se apague.
+        await self.hass.services.async_call(
+            "switch", "turn_off", {"entity_id": self._termo_entity}
+        )
         self.async_write_ha_state()
+
+    @property
+    def is_on(self):
+        return self._is_on
+
+class TermoBoostSwitch(SwitchEntity, RestoreEntity):
+    """Interruptor Temporizado 30 min (Boost)."""
+
+    def __init__(self, hass, termo_entity):
+        self.hass = hass
+        self._termo_entity = termo_entity
+        self._is_on = False
+        self._attr_name = "Termo Boost 30m"
+        self._attr_unique_id = f"termo_boost_{termo_entity}"
+        self._attr_icon = "mdi:timer-outline"
+        self._timer_cancel = None
+
+    async def async_turn_on(self, **kwargs):
+        """Activar Boost."""
+        self._is_on = True
+        # Encender termo real
+        await self.hass.services.async_call(
+            "switch", "turn_on", {"entity_id": self._termo_entity}
+        )
+        self.async_write_ha_state()
+
+        # Programar apagado en 30 min
+        target_time = dt_util.now() + timedelta(minutes=30)
+        
+        # Cancelar timer previo si existía
+        if self._timer_cancel:
+            self._timer_cancel()
+            
+        self._timer_cancel = async_track_point_in_time(
+            self.hass, self._timer_callback, target_time
+        )
+
+    async def async_turn_off(self, **kwargs):
+        """Desactivar Boost manual o automáticamente."""
+        self._is_on = False
+        if self._timer_cancel:
+            self._timer_cancel()
+            self._timer_cancel = None
+            
+        # Apagar el termo real
+        await self.hass.services.async_call(
+            "switch", "turn_off", {"entity_id": self._termo_entity}
+        )
+        self.async_write_ha_state()
+
+    @callback
+    def _timer_callback(self, now):
+        """Se ejecuta cuando termina el tiempo."""
+        self.hass.add_job(self.async_turn_off())
+
+    @property
+    def is_on(self):
+        return self._is_on
