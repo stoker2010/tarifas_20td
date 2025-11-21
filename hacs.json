@@ -3,6 +3,5 @@
   "render_readme": true,
   "filename": "tarifas_20td.zip",
   "homeassistant": "2024.1.0",
-  "country": "ES",
-  "iot_class": "local_polling"
+  "country": "ES"
 }
