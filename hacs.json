@@ -1,7 +1,7 @@
 {
-  "name": "Tarifas 2.0TD y Balance Neto",
+  "name": "Tarifas 20TD España",
   "render_readme": true,
-  "filename": "tarifas_20td",
-  "hide_default_branch": true,
-  "homeassistant": "2023.1.0"
+  "filename": "tarifas_20td.zip",
+  "homeassistant": "2024.1.0",
+  "country": "ES"
 }
