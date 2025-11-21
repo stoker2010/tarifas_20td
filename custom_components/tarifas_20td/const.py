@@ -2,24 +2,22 @@
 
 DOMAIN = "tarifas_20td"
 
-# Opciones de Menú
-MENU_OPTION_CASA = "casa"
-MENU_OPTION_TERMO = "termo"
+# Configuración Hogar
+CONF_GRID_SENSOR = "grid_sensor"
+CONF_SOLAR_SENSOR = "solar_sensor"
+CONF_POWER_VALLE = "power_valle"
+CONF_POWER_PUNTA = "power_punta"
+CONF_WORKDAY = "workday_entity"
 
-# Tipos de configuración
-CONF_TYPE = "config_type"
-TYPE_CASA = "type_casa"
-TYPE_TERMO = "type_termo"
+# Configuración Termo
+CONF_TERMO_SWITCH = "termo_switch"
+CONF_TERMO_TEMP_SENSOR = "termo_temp_sensor"
+CONF_TERMO_POWER_SENSOR = "termo_power_sensor"
+CONF_TERMO_NOMINAL_POWER = "termo_nominal_power"
 
-# Variables Casa
-CONF_ENERGY_SENSOR_IMPORT = "energy_sensor_import"
-CONF_ENERGY_SENSOR_EXPORT = "energy_sensor_export"
-CONF_POWER_CONTRACTED = "power_contracted"
-CONF_ZONE = "zone"
+DEFAULT_WORKDAY = "binary_sensor.workday_sensor"
 
-# Variables Termo
-CONF_TERMO_ENTITY = "termo_entity" # El interruptor real (ej: switch.shelly...)
-CONF_TEMP_SENSOR = "temp_sensor"   # El sensor de temperatura real
-
-# Valores por defecto
-DEFAULT_NAME = "Tarifas 2.0TD"
+# Tramos
+TRAMO_VALLE = "valle"
+TRAMO_LLANA = "llana"
+TRAMO_PUNTA = "punta"
