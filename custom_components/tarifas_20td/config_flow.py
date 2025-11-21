@@ -1,32 +1,24 @@
-"""Config flow para Tarifas 2.0TD."""
-import logging
+"""Config Flow para Tarifas 2.0TD."""
+from __future__ import annotations
+
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.core import callback
-from homeassistant.helpers.selector import (
-    EntitySelector,
-    EntitySelectorConfig,
-    SelectSelector,
-    SelectSelectorConfig,
-    SelectSelectorMode,
-)
+from homeassistant.helpers import selector
+import homeassistant.helpers.config_validation as cv
 
 from .const import (
     DOMAIN,
-    MENU_OPTION_CASA,
-    MENU_OPTION_TERMO,
-    CONF_TYPE,
-    TYPE_CASA,
-    TYPE_TERMO,
-    CONF_ENERGY_SENSOR_IMPORT,
-    CONF_ENERGY_SENSOR_EXPORT,
-    CONF_POWER_CONTRACTED,
-    CONF_ZONE,
-    CONF_TERMO_ENTITY,
-    CONF_TEMP_SENSOR,
+    CONF_GRID_SENSOR,
+    CONF_SOLAR_SENSOR,
+    CONF_POWER_VALLE,
+    CONF_POWER_PUNTA,
+    CONF_WORKDAY,
+    DEFAULT_WORKDAY,
+    CONF_TERMO_SWITCH,
+    CONF_TERMO_TEMP_SENSOR,
+    CONF_TERMO_POWER_SENSOR,
+    CONF_TERMO_NOMINAL_POWER,
 )
-
-_LOGGER = logging.getLogger(__name__)
 
 class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Maneja el flujo de configuración."""
@@ -34,82 +26,41 @@ class Tarifas20TDConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
-        """Paso inicial: Menú de selección."""
-        return self.async_show_menu(
-            step_id="user",
-            menu_options=[MENU_OPTION_CASA, MENU_OPTION_TERMO]
+        """Paso inicial: Formulario de usuario."""
+        errors = {}
+
+        if user_input is not None:
+            return self.async_create_entry(title="Gestor Energético", data=user_input)
+
+        data_schema = vol.Schema(
+            {
+                # Sección Hogar
+                vol.Required(CONF_GRID_SENSOR): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor")
+                ),
+                vol.Required(CONF_SOLAR_SENSOR): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor")
+                ),
+                vol.Required(CONF_POWER_VALLE, default=3000): vol.Coerce(int),
+                vol.Required(CONF_POWER_PUNTA, default=4000): vol.Coerce(int),
+                vol.Optional(CONF_WORKDAY, default=DEFAULT_WORKDAY): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="binary_sensor")
+                ),
+
+                # Sección Termo
+                vol.Required(CONF_TERMO_SWITCH): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="switch") # Interruptor real del termo
+                ),
+                vol.Required(CONF_TERMO_TEMP_SENSOR): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor", device_class="temperature")
+                ),
+                vol.Required(CONF_TERMO_POWER_SENSOR): selector.EntitySelector(
+                    selector.EntitySelectorConfig(domain="sensor", device_class="power")
+                ),
+                vol.Required(CONF_TERMO_NOMINAL_POWER, default=1500): vol.Coerce(int),
+            }
         )
 
-    async def async_step_casa(self, user_input=None):
-        """Configuración de Tarifas de la Casa."""
-        errors = {}
-        if user_input is not None:
-            user_input[CONF_TYPE] = TYPE_CASA
-            
-            # 1. Calculamos un título dinámico (ej: Tarifas Península)
-            zona = user_input.get(CONF_ZONE, "Casa")
-            titulo_final = f"Tarifas {zona} 🏠"
-            
-            # 2. Asignamos un ID único para evitar duplicados fantasma
-            # Usamos 'tarifas_casa' como ID base.
-            await self.async_set_unique_id("tarifas_casa_main")
-            self._abort_if_unique_id_configured()
-            
-            _LOGGER.info("Creando entrada Casa con título: %s", titulo_final)
-            
-            return self.async_create_entry(
-                title=titulo_final, 
-                data=user_input
-            )
-
-        schema = vol.Schema({
-            vol.Required(CONF_ENERGY_SENSOR_IMPORT): EntitySelector(
-                EntitySelectorConfig(domain="sensor", device_class="energy")
-            ),
-            vol.Optional(CONF_ENERGY_SENSOR_EXPORT): EntitySelector(
-                EntitySelectorConfig(domain="sensor", device_class="energy")
-            ),
-            vol.Required(CONF_ZONE, default="Peninsula"): SelectSelector(
-                SelectSelectorConfig(
-                    options=["Peninsula", "Canarias", "Ceuta", "Melilla"],
-                    mode=SelectSelectorMode.DROPDOWN,
-                )
-            ),
-            vol.Optional(CONF_POWER_CONTRACTED, default=3.3): float,
-        })
-
         return self.async_show_form(
-            step_id="casa", data_schema=schema, errors=errors
-        )
-
-    async def async_step_termo(self, user_input=None):
-        """Configuración del Termo Eléctrico."""
-        errors = {}
-        if user_input is not None:
-            user_input[CONF_TYPE] = TYPE_TERMO
-            
-            titulo_final = "Termo Inteligente 🚿"
-            
-            # ID único para el termo
-            await self.async_set_unique_id("tarifas_termo_main")
-            self._abort_if_unique_id_configured()
-
-            _LOGGER.info("Creando entrada Termo con título: %s", titulo_final)
-
-            return self.async_create_entry(
-                title=titulo_final, 
-                data=user_input
-            )
-
-        schema = vol.Schema({
-            vol.Required(CONF_TERMO_ENTITY): EntitySelector(
-                EntitySelectorConfig(domain=["switch", "input_boolean"])
-            ),
-            vol.Required(CONF_TEMP_SENSOR): EntitySelector(
-                EntitySelectorConfig(domain="sensor", device_class="temperature")
-            ),
-        })
-
-        return self.async_show_form(
-            step_id="termo", data_schema=schema, errors=errors
+            step_id="user", data_schema=data_schema, errors=errors
         )
