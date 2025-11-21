@@ -1,0 +1,6 @@
+# Ejemplo de estructura. Ajusta 'nombre_de_tu_servicio' al que tengas en __init__.py
+actualizar_precios:
+  name: Actualizar Precios
+  description: Fuerza una actualización inmediata de los precios de la tarifa 20TD.
+  
+# Si tienes más servicios, añádelos aquí
