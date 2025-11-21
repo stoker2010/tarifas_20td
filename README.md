@@ -4,45 +4,42 @@
 [![GitHub version](https://img.shields.io/github/v/release/stoker2010/tarifas_20td?style=for-the-badge&color=blue)](https://github.com/stoker2010/tarifas_20td/releases)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/stoker2010/tarifas_20td/graphs/commit-activity)
 
-**Tarifas 20TD** es un componente personalizado para **Home Assistant** que permite integrar y visualizar los periodos de facturación eléctrica en España (Punta, Llano, Valle) y precios asociados, facilitando el ahorro energético mediante automatizaciones inteligentes.
+**Tarifas 20TD** es una integración avanzada para **Home Assistant** diseñada para gestionar la facturación eléctrica en España. No solo visualiza los periodos (Punta, Llano, Valle), sino que ofrece servicios para interactuar con los datos de precios y optimizar el consumo.
 
 ---
 
-## ✨ Características
+## ✨ Características Principales
 
-* 📊 **Monitorización en tiempo real**: Conoce el periodo tarifario actual al instante.
-* 📅 **Gestión de Festivos**: Detecta automáticamente fines de semana y festivos nacionales para aplicar la tarifa Valle.
-* 🔌 **Integración sencilla**: Compatible con la configuración estándar de sensores de Home Assistant.
-* ⚡ **Optimizado**: Código ligero y eficiente (Basado en v0.6.0 Stable).
+* 📊 **Monitorización de Periodos**: Visualización en tiempo real del periodo actual (P1, P2, P3).
+* 📅 **Gestión de Calendario**: Detección automática de festivos nacionales y fines de semana.
+* 🛠️ **Servicios Integrados**: Comandos ejecutables para forzar actualizaciones o gestionar datos manualmente.
+* ⚡ **Estabilidad**: Basado en la versión v0.6.0 (Stable Release).
 
 ---
 
 ## 🚀 Instalación
 
-### Opción 1: A través de HACS (Recomendado)
+### Vía HACS (Recomendado)
 
-1.  Asegúrate de tener [HACS](https://hacs.xyz/) instalado.
-2.  Ve a **HACS** > **Integraciones**.
-3.  En el menú de los 3 puntos (arriba a la derecha), selecciona **"Repositorios personalizados"**.
-4.  Añade la URL: `https://github.com/stoker2010/tarifas_20td`
-5.  Categoría: **Integration**.
-6.  Busca "Tarifas 20TD" y pulsa **Descargar**.
-7.  Reinicia Home Assistant.
+1.  Abre HACS > Integraciones > menú superior derecho > **Repositorios Personalizados**.
+2.  Añade la URL: `https://github.com/stoker2010/tarifas_20td`
+3.  Categoría: **Integration**.
+4.  Pulsa **Descargar** (asegúrate de seleccionar la versión más reciente).
+5.  Reinicia Home Assistant.
 
-### Opción 2: Manual
+### Instalación Manual
 
 1.  Descarga la última *release* desde GitHub.
-2.  Copia la carpeta `custom_components/tarifas_20td` dentro de tu carpeta `custom_components` en Home Assistant.
+2.  Copia la carpeta `custom_components/tarifas_20td` en tu directorio `custom_components`.
 3.  Reinicia Home Assistant.
 
 ---
 
-## ⚙️ Configuración
+## ⚙️ Configuración YAML
 
-Añade la siguiente configuración a tu archivo `configuration.yaml`. 
+Añade el sensor a tu archivo `configuration.yaml`:
 
 ```yaml
 sensor:
   - platform: tarifas_20td
-    # Opcional: Nombre personalizado para el sensor
     name: "Tarifa Electricidad"
