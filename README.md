@@ -1,67 +1,48 @@
-# Tarifas España 2.0TD & Balance Neto
+# Tarifas Eléctricas 20TD 🇪🇸
 
-[![GitHub release](https://img.shields.io/github/release/stoker2010/tarifas_20td.svg)](https://github.com/stoker2010/tarifas_20td/releases)
-[![hacs_badge](https://img.shields.io/badge/HACS-Integration-orange.svg)](https://github.com/hacs/integration)
-[![Maintainer](https://img.shields.io/badge/maintainer-%40stoker2010-blue.svg)](https://github.com/stoker2010)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![GitHub version](https://img.shields.io/github/v/release/stoker2010/tarifas_20td?style=for-the-badge&color=blue)](https://github.com/stoker2010/tarifas_20td/releases)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/stoker2010/tarifas_20td/graphs/commit-activity)
 
-**[English](#english) | [Español](#español)**
-
----
-
-<a name="english"></a>
-## 🇬🇧 English Description
-
-This Home Assistant Custom Component manages **Spanish 2.0TD electricity tariff periods**, calculates the **Hourly Net Balance** (Virtual Battery), provides **Daily Energy Counters**, and now includes a dedicated **Electric Water Heater (Termo) Manager**.
-
-### ✨ Features
-
-* **Two Devices Created:**
-    1.  **Hogar (Home):** Main energy manager (2.0TD, Net Balance, Daily Counters).
-    2.  **Termo Eléctrico (Water Heater):** Dedicated controls for your water heater.
-* **Hourly Net Balance:** Real & Estimated calculations (Resets at XX:00).
-* **Zero Export Current (Bidirectional):** Calculates Amps (at 240V) to finish the hour at 0 balance (+ Surplus / - Deficit).
-* **Termo Controls:**
-    * Target Temperature Slider (35-60ºC).
-    * Configuration Switches (Surplus Charge, Limit to Max Temp, etc.).
-* **Daily Counters:** Total Import, Export, Consumption (Reset at 00:00).
-
-### 🚀 Installation & Config
-
-1.  Install via **HACS**.
-2.  Add integration via **Settings > Devices & Services**.
-3.  **New:** You will be asked for both Home Energy sensors AND Water Heater (Termo) entities (Switch, Temp, Power).
+**Tarifas 20TD** es un componente personalizado para **Home Assistant** que permite integrar y visualizar los periodos de facturación eléctrica en España (Punta, Llano, Valle) y precios asociados, facilitando el ahorro energético mediante automatizaciones inteligentes.
 
 ---
 
-<a name="español"></a>
-## 🇪🇸 Descripción en Español
+## ✨ Características
 
-Esta integración gestiona los **tramos horarios 2.0TD**, calcula el **Balance Neto Horario** y ahora incluye un **Gestor de Termo Eléctrico**.
-
-### ✨ Características Principales
-
-* **Dos Dispositivos:**
-    1.  **Hogar:** Gestor principal (Tarifas, Balance, Excedentes).
-    2.  **Termo Eléctrico:** Nuevo dispositivo con controles específicos.
-* **Balance Neto Horario:** Real y Estimado (Reset XX:00).
-* **Intensidad Vertido 0:** Amperios (+/-) necesarios para acabar la hora en 0 kWh.
-* **Controles del Termo:**
-    * Slider de Temperatura Objetivo (35-60ºC).
-    * Interruptores de configuración (Carga con excedentes, Límites, etc.).
-* **Contadores Diarios:** Importación Total, Excedentes y Consumo (Reset 00:00).
-
-### 🚀 Instalación
-
-1.  Instala vía **HACS**.
-2.  Configura desde **Dispositivos y Servicios**.
-3.  **Nuevo:** Se te pedirán los datos del Hogar y los del Termo (Interruptor, Sonda Temp, Sensor Potencia).
-
-### 🙌 Agradecimientos
-
-Agradecimiento a los canales de YouTube de Luis **[@domotica_solar](https://www.youtube.com/@domotica_solar)** y Manolo **[@proyectosmicropic](https://www.youtube.com/@proyectosmicropic)**.
-Y también a **[@MiguelAngelLV](https://github.com/MiguelAngelLV)**.
+* 📊 **Monitorización en tiempo real**: Conoce el periodo tarifario actual al instante.
+* 📅 **Gestión de Festivos**: Detecta automáticamente fines de semana y festivos nacionales para aplicar la tarifa Valle.
+* 🔌 **Integración sencilla**: Compatible con la configuración estándar de sensores de Home Assistant.
+* ⚡ **Optimizado**: Código ligero y eficiente (Basado en v0.6.0 Stable).
 
 ---
-<p align="center">
-  Desarrollado por <a href="https://github.com/stoker2010">@stoker2010</a>
-</p>
+
+## 🚀 Instalación
+
+### Opción 1: A través de HACS (Recomendado)
+
+1.  Asegúrate de tener [HACS](https://hacs.xyz/) instalado.
+2.  Ve a **HACS** > **Integraciones**.
+3.  En el menú de los 3 puntos (arriba a la derecha), selecciona **"Repositorios personalizados"**.
+4.  Añade la URL: `https://github.com/stoker2010/tarifas_20td`
+5.  Categoría: **Integration**.
+6.  Busca "Tarifas 20TD" y pulsa **Descargar**.
+7.  Reinicia Home Assistant.
+
+### Opción 2: Manual
+
+1.  Descarga la última *release* desde GitHub.
+2.  Copia la carpeta `custom_components/tarifas_20td` dentro de tu carpeta `custom_components` en Home Assistant.
+3.  Reinicia Home Assistant.
+
+---
+
+## ⚙️ Configuración
+
+Añade la siguiente configuración a tu archivo `configuration.yaml`. 
+
+```yaml
+sensor:
+  - platform: tarifas_20td
+    # Opcional: Nombre personalizado para el sensor
+    name: "Tarifa Electricidad"
